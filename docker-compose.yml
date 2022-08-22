@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        - DEV=true
+    ports:
+      - "8000:8000"
+    networks:
+      - scraper_network
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c "python3 manage.py migrate &&
+             python3 manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=scraperdb
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+    depends_on:
+      - scraperdb
+      - chrome
+
+  scraperdb:
+    image: postgres:14-alpine
+    container_name: "scraperdb"
+    networks:
+      - scraper_network
+    volumes:
+      - dev-scraperdb-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+  chrome:
+    image: "selenium/standalone-chrome:latest"
+    container_name: "chrome"
+    environment:
+      - SE_VNC_NO_PASSWORD=1
+    networks:
+      - scraper_network
+    hostname: chrome
+    shm_size: '2gb'
+    restart: always
+    ports:
+      - "4444:4444"
+
+volumes:
+  dev-scraperdb-data:
+
+networks:
+  scraper_network:
+    name: scraper_network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.95.0/24
+#python3 manage.py wait_for_db &&

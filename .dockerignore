@@ -1,0 +1,17 @@
+# GIT
+.git
+.gitignore
+
+
+# Docker
+.docker
+
+# Python
+scraper/__pycache__/
+scraper/*/__pycache__/
+scraper/*/*/__pycache__/
+scraper/*/*/*/__pycache__/
+.env/
+.venv/
+venv/
+.ash_history
