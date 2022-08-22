@@ -28,20 +28,19 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
         xpath_to_search='.//h2[contains(@class, "heading-base")]//a[contains(@class, "menu-with")]',
         name_xpath="./text()",
     )
-    for x in child_categories:
-        print(x)
-
+    # for x in child_categories:
+    #     print(x)
 
     # Names here needed some special parsing since they were coming with \n and \t symbols.
-    # for x, y in child_categories:
-    #     print(f"!!!!!DEBUG!!!!! REQUESTING:{extract_text_child_category_name(y)} !!!!")
-    #     new_el = scraper.request_url(x)
-    #     # Find all products for all pages.
-    #     genex = scraper.extract_products_from_all_pages(html_element=new_el)
-    #     for x in genex:
-    #         print(x)
-            # product_elem = scraper.request_url(x[0])
-            # scraper.parse_product_page(element_to_parse=product_elem)
+    for x, y in child_categories:
+        print(f"DEBUG:{extract_text_child_category_name(y)}")
+        new_el = scraper.request_url(x)
+        # Find all products for all pages.
+        genex = scraper.extract_products_from_all_pages(html_element=new_el)
+        for x in genex:
+            print(x)
+    # product_elem = scraper.request_url(x[0])
+    # scraper.parse_product_page(element_to_parse=product_elem)
 
     # # TODO:
     # # Find all SubCategories on HtmlElement.
