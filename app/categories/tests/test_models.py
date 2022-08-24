@@ -42,3 +42,5 @@ class TestCategories(TestCase):
         self.assertEqual(new_category_1.category_set.all().count(), 1)
         self.assertEqual(new_category_2.parrent_category.id, 1)
         self.assertEqual(new_category_1.category_set.all().count(), 1)
+        self.assertTrue(new_category_1.is_root)
+        self.assertFalse(new_category_2.is_root)
