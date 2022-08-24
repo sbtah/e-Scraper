@@ -1,3 +1,5 @@
+import time
+
 from scraper.logic.medium import EcommerceScraper
 from scraper.helpers.helpers import extract_text_child_category_name
 
@@ -16,32 +18,32 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
     # genex = scraper.extract_products_from_all_pages(html_element=element)
     # for x in genex:
     #     print(x)
-
+    # =====================================
     # # # TODO:
     # # Find all ChildCategories on HtmlElement and related products.
-    scraper.request_url(
-        "https://www.castorama.pl/produkty/budowa/drewno-budowlane-i-plyty-drewnopochodne.html"
-    )
-    element = scraper.pick_store_by_name_top("Koszalin")
-    child_categories = scraper.extract_urls_with_names(
-        html_element=element,
-        xpath_to_search='.//h2[contains(@class, "heading-base")]//a[contains(@class, "menu-with")]',
-        name_xpath="./text()",
-    )
+    # scraper.request_url(
+    #     "https://www.castorama.pl/produkty/budowa/drewno-budowlane-i-plyty-drewnopochodne.html"
+    # )
+    # element = scraper.pick_store_by_name_top("Koszalin")
+    # child_categories = scraper.extract_urls_with_names(
+    #     html_element=element,
+    #     xpath_to_search='.//h2[contains(@class, "heading-base")]//a[contains(@class, "menu-with")]',
+    #     name_xpath="./text()",
+    # )
     # for x in child_categories:
     #     print(x)
 
     # Names here needed some special parsing since they were coming with \n and \t symbols.
-    for x, y in child_categories:
-        print(f"DEBUG:{extract_text_child_category_name(y)}")
-        new_el = scraper.request_url(x)
-        # Find all products for all pages.
-        genex = scraper.extract_products_from_all_pages(html_element=new_el)
-        for x in genex:
-            print(x)
+    # for x, y in child_categories:
+    #     print(f"DEBUG:{extract_text_child_category_name(y)}")
+    #     new_el = scraper.request_url(x)
+    #     # Find all products for all pages.
+    #     genex = scraper.extract_products_from_all_pages(html_element=new_el)
+    #     for x in genex:
+    #         print(x)
     # product_elem = scraper.request_url(x[0])
     # scraper.parse_product_page(element_to_parse=product_elem)
-
+    # =====================================
     # # TODO:
     # # Find all SubCategories on HtmlElement.
     # element = scraper.request_url("https://www.castorama.pl/produkty/budowa.html")
@@ -77,14 +79,15 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
 
     # # # ## TODO:
     # # # ### Parse all main categories. Task. Selenium.
-    # element = scraper.request_url(scraper.main_url)
-    # categories = scraper.extract_urls_with_names(
-    #     html_element=element,
-    #     xpath_to_search=scraper.main_categories_elements_xpath,
-    #     name_xpath="./@title",
-    # )
-    # for x in categories:
-    #     print(x)
+    element = scraper.request_url(scraper.main_url)
+    time.sleep(10)
+    categories = scraper.extract_urls_with_names(
+        html_element=element,
+        xpath_to_search=scraper.main_categories_elements_xpath,
+        name_xpath="./@title",
+    )
+    for x in categories:
+        print(x)
 
     ### TODO:
     ### Validation of request. Check if user agent and ip is correct.
