@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 # TODO:
 # Design an algorythmic way of generating ID numbers
@@ -16,7 +17,7 @@ class Category(models.Model):
     category_name = models.CharField(max_length=255)
 
     # If this is True, then this category does not have any parrents.
-    is_root = models.BooleanField(default=False)
+    is_root = models.BooleanField(default=True)
     is_active = models.BooleanField(blank=True, null=True)
     category_description = models.TextField(blank=True)
     meta_description = models.TextField(blank=True)
@@ -26,6 +27,12 @@ class Category(models.Model):
     parrent_category = models.ForeignKey(
         "self", on_delete=models.SET_NULL, blank=True, null=True
     )
+
+    def save(self, *args, **kwargs):
+        """Custom save method that changes is_root to False if Category was added as a child of another."""
+        super().save(*args, **kwargs)
+        if self.parrent_category:
+            self.is_root = False
 
     def __str__(self):
         return self.category_name
