@@ -1,4 +1,5 @@
 from django.db import models
+from categories.models import Category
 from django.contrib.postgres.fields import ArrayField
 
 
@@ -6,19 +7,48 @@ class Product(models.Model):
     """Class for Product object."""
 
     # Values that will come from discovery process.
-    #  When parsing URLS/NAMES at Category page.
+    # When parsing URLS/NAMES at Category page.
     current_url = models.CharField(max_length=255, unique=True)
     product_name = models.CharField(max_length=255)
 
+    is_active = models.BooleanField(blank=True, null=True)
     product_brand = models.CharField(max_length=255, blank=True)
     product_sku = models.CharField(max_length=255, blank=True, unique=True)
-    product_description = models.TextField()
+    product_description = models.TextField(blank=True)
+    # Not tracked in scraper yet.
+    meta_description = models.TextField(blank=True)
+    # Not tracked in scraper yet.
+    canonical_url = models.CharField(max_length=255, blank=True)
+    # Not tracked in scraper yet.
+    seo_title = models.CharField(max_length=255, blank=True)
     product_traits = ArrayField(
         models.CharField(max_length=100, blank=True),
         blank=True,
         null=True,
     )
     product_promo_type = models.CharField(max_length=255, blank=True)
+    product_warranty_time = models.CharField(max_length=100, blank=True)
+    product_ean = models.CharField(max_length=13, blank=True)
+    parrent_category = models.ForeignKey(
+        Category, models.SET_NULL, blank=True, null=True
+    )
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product_name}"
+
+
+class ProductLocalData(models.Model):
+    """
+    Class for Product's data for local store only.
+    Since value for stock/price
+    """
+
+    is_tracked = models.BooleanField(default=False)
+    store_name = models.CharField(max_length=255, blank=True)
+    product_availability = models.BooleanField(default=False)
+    product_current_stock = models.CharField(max_length=255, blank=True)
     product_price_for_unit = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, null=True
     )
@@ -30,12 +60,36 @@ class Product(models.Model):
     product_price_before_promo = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, null=True
     )
-    product_warranty_time = models.CharField(max_length=100, blank=True)
-    product_ean = models.CharField(max_length=13, blank=True)
     product_availability = models.CharField(max_length=50, blank=True)
     product_current_stock = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    parrent_product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.store_name}"
+
+    class Meta:
+        verbose_name_plural = "ProductLocalData"
+
+
+class ProductExtraField(models.Model):
+    """
+    Class for product's extra field.
+    Used to extend Product object with extra data,
+        that I will decide to scrape in the future.
+    """
+
+    name = models.CharField(max_length=255, blank=True)
+    value = models.TextField(blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    parrent_product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name}"
+
+    class Meta:
+        verbose_name_plural = "ProductExtraField"
