@@ -1,6 +1,5 @@
 from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # TODO:
 # Design an algorythmic way of generating ID numbers
@@ -16,8 +15,27 @@ class Category(models.Model):
     current_url = models.CharField(max_length=255, unique=True)
     category_name = models.CharField(max_length=255)
 
-    # If this is True, then this category does not have any parrents.
-    is_root = models.BooleanField(default=True)
+    # I use single object for all Categories.
+    # To differ root Category from childs I will use nesting levels.
+    # Where root Category is 1.
+    class NestLevel(models.IntegerChoices):
+        first = 1
+        second = 2
+        third = 3
+        fourth = 4
+        fifth = 5
+        sixth = 6
+        seventh = 7
+        eighth = 8
+        ninth = 9
+        tenth = 10
+
+    category_nesting_level = models.IntegerField(
+        choices=NestLevel.choices,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        blank=True,
+        null=True,
+    )
     is_active = models.BooleanField(blank=True, null=True)
     category_description = models.TextField(blank=True)
     meta_description = models.TextField(blank=True)
