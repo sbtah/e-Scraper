@@ -42,7 +42,6 @@ class Product(models.Model):
 class ProductLocalData(models.Model):
     """
     Class for Product's data for local store only.
-    Since value for stock/price
     """
 
     is_tracked = models.BooleanField(default=False)

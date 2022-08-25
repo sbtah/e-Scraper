@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "scraper",
     "products",
     "categories",
+    "tasker",
 ]
 
 MIDDLEWARE = [

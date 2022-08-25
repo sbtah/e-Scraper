@@ -46,14 +46,14 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
     # =====================================
     # # TODO:
     # # Find all SubCategories on HtmlElement.
-    # element = scraper.request_url("https://www.castorama.pl/produkty/budowa.html")
-    # sub_categories = scraper.extract_urls_with_names(
-    #     html_element=element,
-    #     xpath_to_search='.//h4[contains(@class, "category")]//a[1]',
-    #     name_xpath="./@title",
-    # )
-    # for x in sub_categories:
-    #     print(x)
+    element = scraper.request_url("https://www.castorama.pl/produkty/budowa.html")
+    sub_categories = scraper.extract_urls_with_names(
+        html_element=element,
+        xpath_to_search='.//h4[contains(@class, "category")]//a[1]',
+        name_xpath="./@title",
+    )
+    for x in sub_categories:
+        print(x)
 
     # # ## TODO:
     # ### Parse all stores. Task. No Selenium. Scout task.
@@ -79,15 +79,15 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
 
     # # # ## TODO:
     # # # ### Parse all main categories. Task. Selenium.
-    element = scraper.request_url(scraper.main_url)
-    time.sleep(10)
-    categories = scraper.extract_urls_with_names(
-        html_element=element,
-        xpath_to_search=scraper.main_categories_elements_xpath,
-        name_xpath="./@title",
-    )
-    for x in categories:
-        print(x)
+    # element = scraper.request_url(scraper.main_url)
+    # time.sleep(10)
+    # categories = scraper.extract_urls_with_names(
+    #     html_element=element,
+    #     xpath_to_search=scraper.main_categories_elements_xpath,
+    #     name_xpath="./@title",
+    # )
+    # for x in categories:
+    #     print(x)
 
     ### TODO:
     ### Validation of request. Check if user agent and ip is correct.
