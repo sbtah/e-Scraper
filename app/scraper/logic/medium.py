@@ -62,6 +62,11 @@ class EcommerceScraper(BaseScraper):
         return './/a[contains(@class, "categories-menu-recursive-level__link")]'
 
     @property
+    def child_categories_elements_xpath(self):
+        """Used to find all Child Categories on main Category page."""
+        return './/h4[contains(@class, "category")]//a[1]'
+
+    @property
     def local_stores_elements_xpath(self):
         """Used on stores sub page."""
         return './/div[@class="row"]//h3//a'
@@ -134,7 +139,10 @@ class EcommerceScraper(BaseScraper):
             return html_after
 
     def extract_products_urls_with_names(self, html_element):
-        """"""
+        """
+        Given the Category HtmlElement.
+        Locate URLS/Names of Products.
+        """
         product_data = self.extract_urls_with_names(
             html_element=html_element,
             xpath_to_search=self.products_elements_xpath,
@@ -220,7 +228,7 @@ class EcommerceScraper(BaseScraper):
             logging.info("Store Picker element not found - store is picked.")
             return True
 
-    def parse_product_single_value(
+    def parse_single_value(
         self,
         html_element,
         xpath_to_search,
@@ -245,7 +253,7 @@ class EcommerceScraper(BaseScraper):
 
         return product_value
 
-    def parse_product_list_values(
+    def parse_list_values(
         self,
         html_element,
         xpath_to_search,
@@ -270,7 +278,7 @@ class EcommerceScraper(BaseScraper):
 
         return product_values
 
-    def parse_product_value_from_many_elements(
+    def parse_value_from_many_elements(
         self,
         html_element,
         xpath_to_search,
@@ -322,7 +330,7 @@ class EcommerceScraper(BaseScraper):
         """
 
         # TODO:
-        # Since we can access product url directly we have to be sure that we closed a cookies modal ? (if needed? Data is getting parsed by XPATH...)
+        # Since I can access product url directly I have to be sure that cookies modal is closed ? (if needed? Data is getting parsed by XPATH...)
         # Check for store to be picked on product page. Other wise data is useless.
         store_picked = self.is_store_picked(element_to_parse)
 
@@ -336,7 +344,7 @@ class EcommerceScraper(BaseScraper):
 
             ### PRODUCT Brand.
             # NOT ALL PRODUCTS HAVE A BRAND.
-            product_brand = self.parse_product_single_value(
+            product_brand = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//div[contains(@class, "product-content-header__brand")]//span[contains(@class, "brand-text")]/following-sibling::a[contains(@class, "brand-link")]/text()',
                 default_on_fail="",
@@ -344,7 +352,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT Sku
-            product_sku = self.parse_product_single_value(
+            product_sku = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//div[contains(@class, "product-content-header__brand")]//span[@class="product-content-header__product-sku"]//span/text()',
                 default_on_fail="",
@@ -352,7 +360,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT Description
-            product_description = self.parse_product_single_value(
+            product_description = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//div[@class="product-main-data__description"]/text()',
                 default_on_fail="",
@@ -360,7 +368,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT Traits.
-            product_traits = self.parse_product_list_values(
+            product_traits = self.parse_list_values(
                 html_element=element_to_parse,
                 xpath_to_search='.//ul[@class="product-main-data__benefits product-benefits"]//li[@class="product-benefits__item"]/text()',
                 default_on_fail=[],
@@ -368,7 +376,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT PROMO Type
-            product_promo_type = self.parse_product_single_value(
+            product_promo_type = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//section[contains(@class, "product-main-data")]//div[contains(@class, "product-labels")]//a[not(@title="nowość")]/span/text()',
                 default_on_fail="",
@@ -377,7 +385,7 @@ class EcommerceScraper(BaseScraper):
 
             ### Side Bar DATA ###
             ### PRODUCT PRICE FOR Unit.
-            product_price_for_unit = self.parse_product_single_value(
+            product_price_for_unit = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//section[contains(@class, "product-page-price-box")]//span[@test-id="pageProductPriceBoxValue"]/text()',
                 default_on_fail=0,
@@ -385,7 +393,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT UNIT Type
-            product_unit_type = self.parse_product_value_from_many_elements(
+            product_unit_type = self.parse_value_from_many_elements(
                 html_element=element_to_parse,
                 xpath_to_search='.//section[contains(@class, "product-page-price-box")]//span[@class="price-unit price-unit--product-page-price-box"]',
                 default_on_fail="",
@@ -393,7 +401,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT PRICE FOR Piece
-            product_price_for_piece = self.parse_product_value_from_many_elements(
+            product_price_for_piece = self.parse_value_from_many_elements(
                 html_element=element_to_parse,
                 xpath_to_search='.//span[contains(@class, "conversion-info__price-value")]',
                 default_on_fail=0,
@@ -401,7 +409,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT PIECE Type.
-            product_piece_type = self.parse_product_single_value(
+            product_piece_type = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//span[@class="price-unit"]/text()',
                 default_on_fail="",
@@ -409,7 +417,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ## PRODUCT PRICE BEFORE Promo.
-            product_price_before_promo = self.parse_product_value_from_many_elements(
+            product_price_before_promo = self.parse_value_from_many_elements(
                 html_element=element_to_parse,
                 xpath_to_search='.//span[contains(@class, "price-value") and contains(@class, "old-value")]',
                 default_on_fail=0,
@@ -418,7 +426,7 @@ class EcommerceScraper(BaseScraper):
 
             ### Aditional Info DATA ###
             ### PRODUCT WARRANTY Time.
-            product_warranty_time = self.parse_product_single_value(
+            product_warranty_time = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//h3[contains(text(), "indywidualne")]/following-sibling::table//tr/child::td[contains(text(), "Gwarancja")]/following-sibling::td/text()',
                 default_on_fail="",
@@ -426,7 +434,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT EAN Code.
-            product_ean = self.parse_product_single_value(
+            product_ean = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//h3[contains(text(), "indywidualne")]/following-sibling::table//tr/child::td[contains(text(), "EAN")]/following-sibling::td/text()',
                 default_on_fail="",
@@ -434,7 +442,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT Availability.
-            product_availability = self.parse_product_single_value(
+            product_availability = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//div[contains(@class, "product-page-sidebar")]//span[contains(@class, "availability-text")]/text()',
                 default_on_fail="",
@@ -442,7 +450,7 @@ class EcommerceScraper(BaseScraper):
             )
 
             ### PRODUCT CURRENT Stock.
-            product_current_stock = self.parse_product_single_value(
+            product_current_stock = self.parse_single_value(
                 html_element=element_to_parse,
                 xpath_to_search='.//div[contains(@class, "product-page-sidebar")]//span[contains(@class, "product-quantity-text")]/text()',
                 default_on_fail="",

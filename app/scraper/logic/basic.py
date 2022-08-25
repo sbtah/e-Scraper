@@ -56,10 +56,12 @@ class BaseScraper:
             options.add_argument("--disable-blink-features")
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_argument("--disable-infobars")
+            options.add_argument("--ignore-ssl-errors=yes")
+            options.add_argument("--ignore-certificate-errors")
             options.add_experimental_option("useAutomationExtension", False)
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             self._driver = webdriver.Remote(
-                command_executor="http://192.168.95.3:4444/wd/hub",
+                command_executor="http://chrome:4444/wd/hub",
                 options=options,
             )
 
