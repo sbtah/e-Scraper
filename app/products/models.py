@@ -1,5 +1,4 @@
 from django.db import models
-from categories.models import Category
 from django.contrib.postgres.fields import ArrayField
 
 
@@ -8,12 +7,14 @@ class Product(models.Model):
 
     # Values that will come from discovery process.
     # When parsing URLS/NAMES at Category page.
-    current_url = models.CharField(max_length=255, unique=True)
+    discovery_url = models.CharField(max_length=255, unique=True)
     product_name = models.CharField(max_length=255)
 
+    # Since Products can be redirected also....
+    current_url = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(blank=True, null=True)
     product_brand = models.CharField(max_length=255, blank=True)
-    product_sku = models.CharField(max_length=255, blank=True, unique=True)
+    product_sku = models.CharField(max_length=255, blank=True)
     product_description = models.TextField(blank=True)
     # Not tracked in scraper yet.
     meta_description = models.TextField(blank=True)
@@ -29,11 +30,15 @@ class Product(models.Model):
     product_promo_type = models.CharField(max_length=255, blank=True)
     product_warranty_time = models.CharField(max_length=100, blank=True)
     product_ean = models.CharField(max_length=13, blank=True)
-    parrent_category = models.ForeignKey(
-        Category, models.SET_NULL, blank=True, null=True
+    parrent_categories = ArrayField(
+        models.IntegerField(null=True, blank=True),
+        blank=True,
+        null=True,
     )
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    last_discovery = models.DateTimeField(blank=True, null=True)
+    last_scrape = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.product_name}"
@@ -66,6 +71,7 @@ class ProductLocalData(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     parrent_product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    last_scrape = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.store_name}"
