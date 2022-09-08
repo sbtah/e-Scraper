@@ -16,7 +16,7 @@ def random_sleep_small():
 def random_sleep_medium():
     """Custom sleep function that sleeps from 3 to 6 seconds"""
 
-    value = randint(4, 6)
+    value = randint(6, 8)
     logging.info(f"Random medium sleep call {value}")
     return time.sleep(value)
 
