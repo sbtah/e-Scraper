@@ -361,7 +361,8 @@ class BaseScraper:
         Used for traversing page's url structure.
         Find all main Urls and 'Names' in given HtmlElements.
         Returns generator of tuples, containing (url, name).
-        ::param name_xpath:: Can be set to ./text() or some other argument in tag.
+        ::param name_xpath:: Can be set to ./text(),
+            - or some other argument in HTML tag where data is located.
         """
         categories_list = self.find_all_elements(
             html_element=html_element,
