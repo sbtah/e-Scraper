@@ -1,4 +1,11 @@
+"""
+Test scraping tasks. Works with database.
+"""
+
 from tasker.logic import ScrapingTasker
 
 with ScrapingTasker() as scraper:
-    scraper.discover_all_child_categories()
+    # scraper.discover_main_categories()
+    # scraper.discover_all_child_categories()
+    # scraper.discover_all_sub_categories()
+    scraper.discover_all_products()
