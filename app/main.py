@@ -1,5 +1,8 @@
-import time
+"""
+Test pure scraper class. No integration with db.
+"""
 
+import time
 from scraper.logic.medium import EcommerceScraper
 from scraper.helpers.helpers import extract_text_child_category_name
 
@@ -12,12 +15,12 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
 
     ### TODO:
     ### Find all products on given page with parsing through all pages.
-    # element = scraper.request_url(
-    #     "https://www.castorama.pl/produkty/budowa/drewno-budowlane-i-plyty-drewnopochodne/drewno-konstrukcyjne.html"
-    # )
-    # genex = scraper.extract_products_from_all_pages(html_element=element)
-    # for x in genex:
-    #     print(x)
+    element = scraper.request_url(
+        "https://www.castorama.pl/produkty/instalacja/technika-grzewcza-i-ogrzewanie/podgrzewacze-wody.html"
+    )
+    genex = scraper.extract_products_from_all_pages(html_element=element)
+    for x in genex:
+        print(x)
     # =====================================
     # # # TODO:
     # # Find all ChildCategories on HtmlElement and related products.
@@ -46,14 +49,14 @@ with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
     # =====================================
     # # TODO:
     # # Find all SubCategories on HtmlElement.
-    element = scraper.request_url("https://www.castorama.pl/produkty/budowa.html")
-    sub_categories = scraper.extract_urls_with_names(
-        html_element=element,
-        xpath_to_search='.//h4[contains(@class, "category")]//a[1]',
-        name_xpath="./@title",
-    )
-    for x in sub_categories:
-        print(x)
+    # element = scraper.request_url("https://www.castorama.pl/produkty/budowa.html")
+    # sub_categories = scraper.extract_urls_with_names(
+    #     html_element=element,
+    #     xpath_to_search='.//h4[contains(@class, "category")]//a[1]',
+    #     name_xpath="./@title",
+    # )
+    # for x in sub_categories:
+    #     print(x)
 
     # # ## TODO:
     # ### Parse all stores. Task. No Selenium. Scout task.
