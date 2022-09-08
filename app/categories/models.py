@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from products.models import Product
 
 # TODO:
 # Design an algorythmic way of generating ID numbers
@@ -12,7 +13,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Category(models.Model):
     """Class for category object."""
 
-    current_url = models.CharField(max_length=255, unique=True)
+    discovery_url = models.CharField(max_length=255, unique=True)
     category_name = models.CharField(max_length=255)
 
     # I use single object for all Categories.
@@ -25,14 +26,12 @@ class Category(models.Model):
         fourth = 4
         fifth = 5
         sixth = 6
-        seventh = 7
-        eighth = 8
-        ninth = 9
-        tenth = 10
 
+    # Sometimes entire Category can be redirected...
+    current_url = models.CharField(max_length=255, blank=True)
     category_nesting_level = models.IntegerField(
         choices=NestLevel.choices,
-        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        validators=[MinValueValidator(1), MaxValueValidator(6)],
         blank=True,
         null=True,
     )
@@ -45,12 +44,13 @@ class Category(models.Model):
     parrent_category = models.ForeignKey(
         "self", on_delete=models.SET_NULL, blank=True, null=True
     )
-
-    def save(self, *args, **kwargs):
-        """Custom save method that changes is_root to False if Category was added as a child of another."""
-        super().save(*args, **kwargs)
-        if self.parrent_category:
-            self.is_root = False
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_discovery = models.DateTimeField(blank=True, null=True)
+    last_scrape = models.DateTimeField(blank=True, null=True)
+    related_categories_last_discovery = models.DateTimeField(blank=True, null=True)
+    related_products_last_discovery = models.DateTimeField(blank=True, null=True)
+    products = models.ManyToManyField(Product, blank=True)
 
     def __str__(self):
         return self.category_name
