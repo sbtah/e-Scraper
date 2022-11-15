@@ -6,21 +6,21 @@ class Product(models.Model):
     """Class for Product object."""
 
     # Values that will come from discovery process.
-    # When parsing URLS/NAMES at Category page.
+    #!! When parsing URLS/NAMES at Category page.
     discovery_url = models.CharField(max_length=255, unique=True)
     product_name = models.CharField(max_length=255)
 
-    # Since Products can be redirected also....
+    #!! Since Products can be redirected also....
     current_url = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(blank=True, null=True)
     product_brand = models.CharField(max_length=255, blank=True)
     product_sku = models.CharField(max_length=255, blank=True)
     product_description = models.TextField(blank=True)
-    # Not tracked in scraper yet.
+    #!! Not tracked in scraper yet.
     meta_description = models.TextField(blank=True)
-    # Not tracked in scraper yet.
+    #!! Not tracked in scraper yet.
     canonical_url = models.CharField(max_length=255, blank=True)
-    # Not tracked in scraper yet.
+    #!! Not tracked in scraper yet.
     seo_title = models.CharField(max_length=255, blank=True)
     product_traits = ArrayField(
         models.CharField(max_length=100, blank=True),
@@ -35,7 +35,9 @@ class Product(models.Model):
         blank=True,
         null=True,
     )
+    # !!
     updated = models.DateTimeField(auto_now=True)
+    # !!
     created = models.DateTimeField(auto_now_add=True)
     last_discovery = models.DateTimeField(blank=True, null=True)
     last_scrape = models.DateTimeField(blank=True, null=True)

@@ -1,6 +1,6 @@
 from scraper.helpers import auth
 from scraper.helpers.logging import logging
-from scraper.logic.basic import BaseScraper
+from scraper.logic.base_scraper import BaseScraper
 from scraper.helpers.helpers import (
     random_sleep_medium,
     random_sleep_small,
@@ -13,7 +13,7 @@ from selenium.common.exceptions import (
 )
 
 
-class EcommerceScraper(BaseScraper):
+class Scraper(BaseScraper):
     def __init__(self, use_python=False, use_selenium=True, *args, **kwargs):
         self.use_selenium = use_selenium
         self.use_python = use_python

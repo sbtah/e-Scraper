@@ -3,10 +3,10 @@ Test pure scraper class. No integration with db.
 """
 
 import time
-from scraper.logic.medium import EcommerceScraper
+from scraper.logic.scraper import Scraper
 from scraper.helpers.helpers import extract_text_child_category_name
 
-with EcommerceScraper(use_selenium=True, use_python=False) as scraper:
+with Scraper(use_selenium=True, use_python=False) as scraper:
     # scraper.request_url(
     #     "https://www.castorama.pl/sruby-do-deski-tycner-b-203-komplet-id-37638.html"
     # )

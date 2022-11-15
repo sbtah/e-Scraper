@@ -11,4 +11,4 @@ with ScrapingTasker() as scraper:
     scraper.refresh_current_session()
     scraper.discover_all_sub_categories()
     scraper.refresh_current_session()
-    scraper.discover_all_products()
+    # scraper.discover_all_products()

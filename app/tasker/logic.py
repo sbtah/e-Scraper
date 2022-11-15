@@ -17,7 +17,7 @@ from products.builders import discovery_update_or_create_product
 from categories.models import Category
 from categories.builders import update_or_create_category
 
-from scraper.logic.medium import EcommerceScraper
+from app.scraper.logic.scraper import EcommerceScraper
 from scraper.helpers.logging import logging
 
 
