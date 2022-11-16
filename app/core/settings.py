@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-zl!6&u0oa!qr=z6hygq4t(pfpftkz=9$-nfgb$5#-ie+!bp8hc"
+SECRET_KEY = "django-insecure-09fu9utj+a3s!s22b&be5bq3wi1%*-j0prqe-pntowr__y=2l0"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -27,11 +27,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "scraper",
-    "products",
-    "categories",
-    "tasker",
-    'pages',
-    'stores'
 ]
 
 MIDDLEWARE = [
@@ -78,6 +73,7 @@ DATABASES = {
     }
 }
 
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -100,13 +96,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "pl-PL"
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Europe/Warsaw"
+TIME_ZONE = "UTC"
 
-USE_I18N = False
-USE_L10N = False
-USE_TZ = False
+USE_I18N = True
+
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -118,12 +114,3 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-DATETIME_FORMAT = [
-    "%d/%m/%Y, %H:%M:%S",
-]
-
-DATE_INPUT_FORMATS = [
-    "%d/%m/%Y, %H:%M:%S",
-]

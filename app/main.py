@@ -1,106 +1,70 @@
-"""
-Test pure scraper class. No integration with db.
-"""
-
+from scraper.sites.kiddymoon import KiddyMoon
+from scraper.sites.castorama import Castorama
 import time
-from scraper.logic.scraper import Scraper
-from scraper.helpers.helpers import extract_text_child_category_name
+from urllib.parse import urljoin
+from lxml.html import tostring
 
-with Scraper(use_selenium=True, use_python=False) as scraper:
-    # scraper.request_url(
-    #     "https://www.castorama.pl/sruby-do-deski-tycner-b-203-komplet-id-37638.html"
-    # )
-    # element = scraper.pick_store_by_name_top("Koszalin")
-    # print(scraper.parse_product_page(element_to_parse=element))
 
-    ### TODO:
-    ### Find all products on given page with parsing through all pages.
-    element = scraper.request_url(
-        "https://www.castorama.pl/produkty/instalacja/technika-grzewcza-i-ogrzewanie/podgrzewacze-wody.html"
-    )
-    genex = scraper.extract_products_from_all_pages(html_element=element)
-    for x in genex:
-        print(x)
-    # =====================================
-    # # # TODO:
-    # # Find all ChildCategories on HtmlElement and related products.
-    # scraper.request_url(
-    #     "https://www.castorama.pl/produkty/budowa/drewno-budowlane-i-plyty-drewnopochodne.html"
+products_urls_kiddy = [
+    "https://kiddymoon.pl/pl/newproducts/nowosc.html",
+    "https://kiddymoon.pl/pl/menu/suche-baseny-1140.html",
+    "https://kiddymoon.pl/pl/menu/pilki-do-basenu-1466.html",
+    "https://kiddymoon.pl/pl/menu/place-zabaw-1480.html",
+    "https://kiddymoon.pl/pl/menu/kitchen-helpery-1465.html",
+    "https://kiddymoon.pl/pl/menu/zabawki-1467.html",
+    "https://kiddymoon.pl/pl/menu/pokoj-dzieciecy-1474.html",
+]
+products_url_casto = "https://www.castorama.pl/produkty/urzadzanie/zarowki-i-swietlowki/zarowki-led.html"  # noqa
+
+
+if __name__ == "__main__":
+    start = time.time()
+    with KiddyMoon() as scraper:
+        for url in products_urls_kiddy:
+            response = scraper.selenium_get(
+                url,
+            )
+            element = scraper.parse_response(response=response)
+            scraper.close_cookies_banner(element=element)
+            products = scraper.find_products_for_all_pages_selenium()
+            for prod in products:
+                prod
+            scraper.do_cleanup()
+    end = time.time()
+    print(end - start)
+    ### GET ELEMENT WITH SELENIUM
+    # response = scraper.selenium_get(scraper.main_url)
+    # element = scraper.parse_response(response=response)
+    # categories_to_track = scraper.extract_urls_with_names_selenium(
+    #     xpath_to_search=scraper.main_categories_xpath,
+    #     url_name_attr="title",
     # )
-    # element = scraper.pick_store_by_name_top("Koszalin")
-    # child_categories = scraper.extract_urls_with_names(
+    # for cat in categories_to_track:
+    #     print(cat)
+
+    ### GET ELEMENT WITH PYTHON
+    # response = scraper.selenium_get(scraper.main_url)
+    # element = scraper.parse_response(response=response)
+    # categories_to_track = scraper.find_all_elements(
     #     html_element=element,
-    #     xpath_to_search='.//h2[contains(@class, "heading-base")]//a[contains(@class, "menu-with")]',
-    #     name_xpath="./text()",
+    #     xpath_to_search=scraper.main_categories_xpath,
+    #     # name_xpath="./@title",
     # )
-    # for x in child_categories:
-    #     print(x)
+    # print(categories_to_track)
+    # for cat in categories_to_track:
+    #     print(cat.xpath("./@href")[0])
+    # response_python = scraper.python_get(scraper.main_url)
+    # with open(f"response-python.txt", "w") as f:
+    #     f.write(response_python)
+    # python_el = scraper.parse_response(response_python)
+    # with open(f"element-python.txt", "w") as f:
+    #     elem = tostring(python_el)
+    #     f.write(str(elem))
 
-    # Names here needed some special parsing since they were coming with \n and \t symbols.
-    # for x, y in child_categories:
-    #     print(f"DEBUG:{extract_text_child_category_name(y)}")
-    #     new_el = scraper.request_url(x)
-    #     # Find all products for all pages.
-    #     genex = scraper.extract_products_from_all_pages(html_element=new_el)
-    #     for x in genex:
-    #         print(x)
-    # product_elem = scraper.request_url(x[0])
-    # scraper.parse_product_page(element_to_parse=product_elem)
-    # =====================================
-    # # TODO:
-    # # Find all SubCategories on HtmlElement.
-    # element = scraper.request_url("https://www.castorama.pl/produkty/budowa.html")
-    # sub_categories = scraper.extract_urls_with_names(
-    #     html_element=element,
-    #     xpath_to_search='.//h4[contains(@class, "category")]//a[1]',
-    #     name_xpath="./@title",
-    # )
-    # for x in sub_categories:
-    #     print(x)
-
-    # # ## TODO:
-    # ### Parse all stores. Task. No Selenium. Scout task.
-    # element = scraper.request_url(scraper.stores_url)
-    # genex = scraper.extract_urls_with_names(
-    #     html_element=element,
-    #     xpath_to_search=scraper.local_stores_elements_xpath,
-    #     name_xpath=".//text()",
-    # )
-    # for x in genex:
-    #     print(x)
-
-    # # ## TODO:
-    # # ### Parse all main categories. Task. No Selenium. Scout task.
-    # element = scraper.python_get(scraper.main_url)
-    # elements = scraper.extract_urls_with_names(
-    #     html_element=element,
-    #     xpath_to_search=scraper.main_categories_elements_xpath,
-    #     name_xpath="./@title",
-    # )
-    # for x in elements:
-    #     print(x)
-
-    # # # ## TODO:
-    # # # ### Parse all main categories. Task. Selenium.
-    # element = scraper.request_url(scraper.main_url)
-    # time.sleep(10)
-    # categories = scraper.extract_urls_with_names(
-    #     html_element=element,
-    #     xpath_to_search=scraper.main_categories_elements_xpath,
-    #     name_xpath="./@title",
-    # )
-    # for x in categories:
-    #     print(x)
-
-    ### TODO:
-    ### Validation of request. Check if user agent and ip is correct.
-    # scraper.request_url("http://www.ipconfig.org/")
-    # time.sleep(5)
-
-    # ## TODO:
-    # ## Close cookies policy upon request.
-    # element = scraper.request_url(scraper.main_url)
-    # scraper.close_cookies_policy(
-    #     html_element=element,
-    #     xpath_to_search=scraper.cookies_policy_close_button,
-    # )
+    # response_selenium = scraper.selenium_get(scraper.main_url)
+    # with open(f"response-selenium.txt", "w") as f:
+    #     f.write(response_selenium)
+    # selenium_el = scraper.parse_response(response_selenium)
+    # with open(f"element-selenium.txt", "w") as f:
+    #     elem = tostring(selenium_el)
+    #     f.write(str(elem))
