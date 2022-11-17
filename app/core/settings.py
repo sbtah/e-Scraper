@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "scraper",
-    "websites",
+    "projects",
 ]
 
 MIDDLEWARE = [
