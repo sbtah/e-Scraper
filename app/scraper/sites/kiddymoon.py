@@ -1,5 +1,4 @@
 from scraper.logic.ecommerce import EcommerceScraper
-from scraper.helpers.logging import logging
 
 
 class KiddyMoon(EcommerceScraper):

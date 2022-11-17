@@ -1,26 +1,33 @@
 import asyncio
-import httpx
+import logging
+import sys
+from datetime import datetime
+from logging import Formatter, StreamHandler
 from urllib.parse import urljoin
-from lxml.html import HtmlElement, HTMLParser, tostring, fromstring, document_fromstring
-from lxml.html import tostring
 
+import httpx
+from lxml.html import (
+    HtmlElement,
+    HTMLParser,
+    document_fromstring,
+    fromstring,
+    tostring,
+)
+from scraper.helpers.randoms import (
+    random_sleep_medium,
+    random_sleep_small,
+    random_sleep_small_l2,
+)
 from selenium import webdriver
-from selenium.webdriver import DesiredCapabilities
 from selenium.common.exceptions import (
     ElementNotVisibleException,
     NoSuchElementException,
 )
+from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
-
-from scraper.helpers.logging import logging
-from scraper.helpers.randoms import (
-    random_sleep_small,
-    random_sleep_small_l2,
-    random_sleep_medium,
-)
 
 
 class BaseScraper:
@@ -29,6 +36,15 @@ class BaseScraper:
     def __init__(self, *args, **kwargs):
         self._driver = None
         self.teardown = True
+        self.logger = logging.getLogger(__file__)
+        self.logger.setLevel(logging.INFO)
+        self.handler = StreamHandler(stream=sys.stdout)
+        self.handler.setFormatter(
+            Formatter(fmt="[%(asctime)s: %(levelname)s] %(message)s")
+        )
+        self.logger.addHandler(self.handler)
+        self.time_started = datetime.now()
+        self.logger.info(f"Started scraper for : '{__file__}'")
         # self.get_with_selenium = get_with_selenium
 
     def __str__(self):
@@ -82,7 +98,7 @@ class BaseScraper:
             options.add_argument("--disable-infobars")
             options.add_argument("--ignore-ssl-errors=yes")
             options.add_argument("--ignore-certificate-errors")
-            options.add_experimental_option("useAutomationExtension", False)
+            # options.add_experimental_option("useAutomationExtension", False)
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_argument("--start-maximized")
 
@@ -113,11 +129,11 @@ class BaseScraper:
 
         try:
             self.driver.get(url)
-            logging.info(f"Requesting with selenium: {url}")
+            self.logger.info(f"Requesting with selenium: {url}")
             random_sleep_small()
             return self.driver.page_source
         except Exception as e:
-            logging.error(f"(selenium_get) Exception: {e}")
+            self.logger.error(f"(selenium_get) Exception: {e}")
             return None
 
     def python_get(self, url):
@@ -135,21 +151,21 @@ class BaseScraper:
 
         try:
             response = httpx.get(url, timeout=30, headers=headers)
-            logging.info(f"Requesting with python: {url}")
+            self.logger.info(f"Requesting with python: {url}")
             random_sleep_small()
             # response.raise_for_status()
             return response.text
         except httpx.TimeoutException:
-            logging.error("Connection was timed out.")
+            self.logger.error("Connection was timed out.")
             return None
         except httpx.ConnectError:
-            logging.error("Connection Error.")
+            self.logger.error("Connection Error.")
             return None
         except httpx.HTTPError:
-            logging.error("HTTPError was raised.")
+            self.logger.error("HTTPError was raised.")
             return None
         except Exception as e:
-            logging.error(f"(python_get) Exception: {e}")
+            self.logger.error(f"(python_get) Exception: {e}")
 
     async def async_get(self, session, url):
         """
@@ -187,7 +203,7 @@ class BaseScraper:
         :param response: Text response from GET.
         """
 
-        assert response, logging.error(
+        assert response, self.logger.error(
             "Parsing response failed, received invalid response object."
         )
         try:
@@ -196,10 +212,10 @@ class BaseScraper:
                 response,
                 parser=hp,
             )
-            logging.debug("Parsing response to HtmlElement.")
+            self.logger.debug("Parsing response to HtmlElement.")
             return element
         except Exception as e:
-            logging.error(f"(parse_response) Exception: {e}")
+            self.logger.error(f"(parse_response) Exception: {e}")
 
     def parse_driver_response(self):
         """
@@ -211,10 +227,12 @@ class BaseScraper:
         try:
             hp = HTMLParser(encoding="utf-8")
             element = fromstring(self.driver.page_source, parser=hp)
-            logging.debug(f"Parsing page to HtmlElement at: {self.driver.current_url}")
+            self.logger.debug(
+                f"Parsing page to HtmlElement at: {self.driver.current_url}"
+            )
             return element
         except Exception as e:
-            logging.error(f"Error parsing page to HTML: {e}")
+            self.logger.error(f"Error parsing page to HTML: {e}")
             return None
 
     def do_cleanup(self):
@@ -226,9 +244,9 @@ class BaseScraper:
 
             self.driver.quit()
             self._driver = None
-            logging.debug("Driver exited, cookies deleted.")
+            self.logger.debug("Driver exited, cookies deleted.")
         else:
-            logging.info("Driver was already closed.")
+            self.logger.info("Driver was already closed.")
 
     def find_selenium_element(
         self,
@@ -247,21 +265,21 @@ class BaseScraper:
                 By.XPATH,
                 xpath_to_search,
             )
-            logging.debug(f"(find_selenium_element), returned: {1} element.")
+            self.logger.debug(f"(find_selenium_element), returned: {1} element.")
             return element
         except ElementNotVisibleException:
-            logging.error(f"Selenium element not visible")
+            self.logger.error(f"Selenium element not visible")
             return None
         except NoSuchElementException:
             if ignore_not_found_errors:
                 return None
             else:
-                logging.error(
+                self.logger.error(
                     f"(find_selenium_element) Selenium element not found. Is the Xpath ok?"
                 )
                 return None
         except Exception as e:
-            logging.error(f"(find_selenium_element) exception: {e}")
+            self.logger.error(f"(find_selenium_element) exception: {e}")
             return None
 
     def find_selenium_elements(
@@ -281,21 +299,21 @@ class BaseScraper:
                 By.XPATH,
                 xpath_to_search,
             )
-            logging.info(
+            self.logger.info(
                 f"(find_selenium_elements), returned: {len(elements)} elements."
             )
             return elements
         except ElementNotVisibleException:
-            logging.error(f"Selenium element not visible.")
+            self.logger.error(f"Selenium element not visible.")
             return None
         except NoSuchElementException:
             if ignore_not_found_errors:
                 return None
             else:
-                logging.error(f"Selenium element not found.")
+                self.logger.error(f"Selenium element not found.")
                 return None
         except Exception as e:
-            logging.error(f"(find_selenium_element) exception: {e}")
+            self.logger.error(f"(find_selenium_element) exception: {e}")
             return None
 
     def find_all_elements(
@@ -314,7 +332,7 @@ class BaseScraper:
         try:
             elements_list = html_element.xpath(xpath_to_search)
             if elements_list:
-                logging.debug(
+                self.logger.debug(
                     f"(find_all_elements), returned: {len(elements_list)} elements."
                 )
                 return elements_list
@@ -322,10 +340,10 @@ class BaseScraper:
                 if ignore_not_found_errors:
                     return None
                 else:
-                    logging.error("(find_all_elements) Returned an empty list.")
+                    self.logger.error("(find_all_elements) Returned an empty list.")
                     return None
         except Exception as e:
-            logging.error(f"(find_all_elements) Some other exception: {e}")
+            self.logger.error(f"(find_all_elements) Some other exception: {e}")
             return None
 
     def initialize_html_element(self, selenium_element):
@@ -338,10 +356,10 @@ class BaseScraper:
         """
         try:
             selenium_element.click()
-            logging.debug("Successfully clicked on specified element.")
+            self.logger.debug("Successfully clicked on specified element.")
             random_sleep_small_l2()
         except NoSuchElementException:
-            logging.error(
+            self.logger.error(
                 "Failed at finding element to click. Maybe element was already clicked?"
             )
             return None
@@ -355,12 +373,12 @@ class BaseScraper:
             html_element.xpath(xpath_to_search)[0]
             return True
         except IndexError:
-            logging.debug(
+            self.logger.debug(
                 f"(if_xpath_in_element) Search for: ('{xpath_to_search}') returned an empty list."
             )
             return None
         except Exception as e:
-            logging.error(f"(if_xpath_in_element), Exception: {e}")
+            self.logger.error(f"(if_xpath_in_element), Exception: {e}")
             return None
 
     def extract_urls_with_names(self, html_element, xpath_to_search, name_attr_xpath):
@@ -378,7 +396,7 @@ class BaseScraper:
         )
 
         if categories_list:
-            logging.info(
+            self.logger.info(
                 f"URLS/Names list created, returned {len(categories_list)} elements."
             )
             return (
@@ -389,7 +407,7 @@ class BaseScraper:
                 for x in categories_list
             )
         else:
-            logging.info(f"Failed loading URLS/Names list from HTML,")
+            self.logger.info(f"Failed loading URLS/Names list from HTML,")
             return None
 
     def extract_urls_with_names_selenium(self, xpath_to_search, url_name_attr):
@@ -406,7 +424,7 @@ class BaseScraper:
         )
 
         if categories_list:
-            logging.info(
+            self.logger.info(
                 f"URLS/Names list created, returned {len(categories_list)} elements."
             )
             return (
@@ -417,7 +435,7 @@ class BaseScraper:
                 for x in categories_list
             )
         else:
-            logging.info(f"Failed loading URLS/Names list from HTML,")
+            self.logger.info(f"Failed loading URLS/Names list from HTML,")
             return None
 
     def send_text_to_element(self, text, selenium_element):
@@ -430,8 +448,8 @@ class BaseScraper:
             selenium_element.send_keys(text)
             selenium_element.send_keys(Keys.ENTER)
             random_sleep_small()
-            logging.info(f"Successfuly send text: '{text}' to desired element.")
+            self.logger.info(f"Successfuly send text: '{text}' to desired element.")
         except ElementNotVisibleException:
-            logging.error("Specified element is not visible.")
+            self.logger.error("Specified element is not visible.")
         except Exception as e:
-            logging.error(f"(send_text_to_element) Some other exception: {e}")
+            self.logger.error(f"(send_text_to_element) Some other exception: {e}")

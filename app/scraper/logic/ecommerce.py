@@ -1,4 +1,3 @@
-from scraper.helpers.logging import logging
 from scraper.helpers.randoms import (
     random_sleep_medium,
     random_sleep_small,
@@ -77,17 +76,17 @@ class EcommerceScraper(BaseScraper):
             html_element=element, xpath_to_search=xpath_to_search
         )
         if if_banner_in_html:
-            logging.info("WebElement found, closing...")
+            self.logger.info("WebElement found, closing...")
             try:
                 cookies_close_button = self.find_selenium_element(
                     xpath_to_search=xpath_to_search
                 )
                 self.initialize_html_element(cookies_close_button)
-                logging.info("Successfully closed WebElement.")
+                self.logger.info("Successfully closed WebElement.")
             except Exception as e:
-                logging.error(f"(close_selenium_element) Some other exception: {e}")
+                self.logger.error(f"(close_selenium_element) Some other exception: {e}")
         else:
-            logging.info("No WebElement to click, passing...")
+            self.logger.info("No WebElement to click, passing...")
 
     def find_all_products(self, html_element):
         """
@@ -105,7 +104,7 @@ class EcommerceScraper(BaseScraper):
             )
             return products
         else:
-            logging.error("(find_all_products) Missing critical Xpathses.")
+            self.logger.error("(find_all_products) Missing critical Xpathses.")
             return None
 
     def find_products_for_all_pages_selenium(self):
@@ -128,7 +127,7 @@ class EcommerceScraper(BaseScraper):
             xpath_to_search=self.current_product_page_xpath,
             ignore_not_found_errors=True,
         )
-        logging.info(
+        self.logger.info(
             f"Current page; XPath: {current_page_number_from_xpath[0].text_content().strip() if current_page_number_from_xpath != None else 1} Counted: {current_page}"
         )
 
@@ -142,7 +141,7 @@ class EcommerceScraper(BaseScraper):
         )
         while next_page_button is not None:
 
-            logging.info(f"Found another product page, proceeding.")
+            self.logger.info(f"Found another product page, proceeding.")
             self.initialize_html_element(next_page_button)
             next_page_button = self.find_selenium_element(
                 xpath_to_search=self.next_product_page_button_xpath,
@@ -156,7 +155,7 @@ class EcommerceScraper(BaseScraper):
                 xpath_to_search=self.current_product_page_xpath,
                 ignore_not_found_errors=True,
             )
-            logging.info(
+            self.logger.info(
                 f"Current page; XPath: {current_page_number_from_xpath[0].text_content().strip() if current_page_number_from_xpath != None else 1} Counted: {current_page}"
             )
 
@@ -165,4 +164,6 @@ class EcommerceScraper(BaseScraper):
                 yield prod
 
         else:
-            logging.info("Next page element not found. Parsing products - finished.")
+            self.logger.info(
+                "Next page element not found. Parsing products - finished."
+            )
