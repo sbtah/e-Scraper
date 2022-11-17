@@ -1,6 +1,6 @@
 Scraper:
-- Add scrape metadata method. that will be called on every requested page.
-    + should return values: 
+    - Add scrape metadata method. that will be called on every requested page.
+    should return values: 
         - discovery_url,
         - current_url,
         - meta_author,
