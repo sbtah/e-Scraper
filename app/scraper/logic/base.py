@@ -98,6 +98,7 @@ class BaseScraper:
             options.add_argument("--disable-infobars")
             options.add_argument("--ignore-ssl-errors=yes")
             options.add_argument("--ignore-certificate-errors")
+            # Deprecated ?
             # options.add_experimental_option("useAutomationExtension", False)
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_argument("--start-maximized")
