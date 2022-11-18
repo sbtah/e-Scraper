@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from projects.models.webpages import WebPage
 
+
 # TODO:
 # Design an algorythmic way of generating ID numbers
 # For example root categories will have a single number id (ie: 1, 2, 12...)
@@ -39,8 +40,6 @@ class CategoryPage(WebPage):
     parrent_category = models.ForeignKey(
         "self", on_delete=models.SET_NULL, blank=True, null=True
     )
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
     last_discovery = models.DateTimeField(blank=True, null=True)
     last_scrape = models.DateTimeField(blank=True, null=True)
     related_categories_last_discovery = models.DateTimeField(blank=True, null=True)

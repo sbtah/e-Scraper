@@ -1,4 +1,5 @@
 from django.db import models
+from projects.models.websites import Website
 
 
 class WebPage(models.Model):
@@ -14,6 +15,7 @@ class WebPage(models.Model):
     seo_title = models.CharField(max_length=255, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    parrent_website = models.ForeignKey(Website, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
