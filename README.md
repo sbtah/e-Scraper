@@ -1,7 +1,17 @@
-# Early prototype of Ecommerce Scraper
+# Early prototype of Ecommerce Scraper v0.02
 --
-Project was created with Selenium and lxml for parsing HTML pages.
-Django and postgresql is used for storing needed data.
-Currently project utilizes selenium/standalone-chrome docker image.
+e-Scraper technologies used :
+- Django,
+- Selenium,
+- Postgresql,
+- Redis, 
+- Celery,
+- Celery Beat,
+- pandas.
 
-In current state I can track products and categories from picked store...
+Functionalities:
+- Track specified products or individual pages,
+- Generate XLSX rapports,
+- Send emails about changes on site,
+- Do basic SEO checks on tracked site,
+

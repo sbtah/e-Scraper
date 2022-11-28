@@ -4,50 +4,53 @@ import time
 from urllib.parse import urljoin
 from lxml.html import tostring
 import importlib
+from celery import Celery
 
-
-websites = [
-    ("kiddymoon", "KiddyMoon"),
-    ("castorama", "Castorama"),
-]
-
-for website in websites:
-    try:
-        module = importlib.import_module(f"scraper.sites.{website[0]}")
-        my_class = getattr(module, f"{website[1]}")
-        print(my_class)
-    except ModuleNotFoundError:
-        print(f"Module was not found: {website[0]}")
-
-
-# products_urls_kiddy = [
-#     "https://kiddymoon.pl/pl/newproducts/nowosc.html",
-#     "https://kiddymoon.pl/pl/menu/suche-baseny-1140.html",
-#     "https://kiddymoon.pl/pl/menu/pilki-do-basenu-1466.html",
-#     "https://kiddymoon.pl/pl/menu/place-zabaw-1480.html",
-#     "https://kiddymoon.pl/pl/menu/kitchen-helpery-1465.html",
-#     "https://kiddymoon.pl/pl/menu/zabawki-1467.html",
-#     "https://kiddymoon.pl/pl/menu/pokoj-dzieciecy-1474.html",
+# websites = [
+#     ("kiddymoon", "KiddyMoon"),
+#     ("castorama", "Castorama"),
 # ]
+
+# for website in websites:
+#     try:
+#         module = importlib.import_module(f"scraper.sites.{website[0]}")
+#         my_class = getattr(module, f"{website[1]}")
+#         print(my_class)
+#     except ModuleNotFoundError:
+#         print(f"Module was not found: {website[0]}")
+
+
+products_urls_kiddy = [
+    "https://kiddymoon.pl/pl/newproducts/nowosc.html",
+    "https://kiddymoon.pl/pl/menu/suche-baseny-1140.html",
+    # "https://kiddymoon.pl/pl/menu/pilki-do-basenu-1466.html",
+    # "https://kiddymoon.pl/pl/menu/place-zabaw-1480.html",
+    # "https://kiddymoon.pl/pl/menu/kitchen-helpery-1465.html",
+    # "https://kiddymoon.pl/pl/menu/zabawki-1467.html",
+    # "https://kiddymoon.pl/pl/menu/pokoj-dzieciecy-1474.html",
+]
 # products_url_casto = "https://www.castorama.pl/produkty/urzadzanie/zarowki-i-swietlowki/zarowki-led.html"  # noqa
 
 
-# if __name__ == "__main__":
-#     start = time.time()
-#     with my_class() as scraper:
-#         for url in products_urls_kiddy:
-#             response = scraper.selenium_get(
-#                 url,
-#             )
-#             element = scraper.parse_response(response=response)
-#             scraper.close_cookies_banner(element=element)
-#             products = scraper.find_products_for_all_pages_selenium()
-#             for prod in products:
-#                 prod
-#             scraper.do_cleanup()
-#     end = time.time()
-#     print(end - start)
+def scraping_task():
+    start = time.time()
+    with KiddyMoon() as scraper:
+        for url in products_urls_kiddy:
+            response = scraper.selenium_get(
+                url,
+            )
+            element = scraper.parse_response(response=response)
+            scraper.close_cookies_banner(element=element)
+            products = scraper.find_products_for_all_pages_selenium()
+            for prod in products:
+                prod
+            scraper.do_cleanup()
+    end = time.time()
+    print(end - start)
 
+
+if __name__ == "__main__":
+    pass
 
 ### GET ELEMENT WITH SELENIUM
 # response = scraper.selenium_get(scraper.main_url)
