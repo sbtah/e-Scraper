@@ -6,7 +6,7 @@ from projects.models.websites import Website
 class TestAboutPage(TestCase):
     """Test cases for AboutPage object."""
 
-    def setUp(self) -> None:
+    def setUp(self):
 
         self.website = Website.objects.create(
             domain="test.com",
@@ -31,3 +31,16 @@ class TestAboutPage(TestCase):
         objects_number_after = AboutPage.objects.all().count()
         self.assertEqual(objects_number_after, 1)
         self.assertTrue(isinstance(page, AboutPage))
+
+    def test_str_method(self):
+        """Test that AboutPage object generates proper __str__"""
+
+        page = AboutPage.objects.create(
+            discovery_url="http://www.test.pl/",
+            parrent_website=self.website,
+            main_title="Test",
+            main_description="Test Description",
+            last_discovery="2022-11-22",
+            last_scrape="2022-11-22",
+        )
+        self.assertEqual(page.main_title, str(page))

@@ -11,4 +11,4 @@ class AboutPage(WebPage):
     last_scrape = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return self.main_title
