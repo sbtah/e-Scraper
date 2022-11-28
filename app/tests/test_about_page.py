@@ -20,6 +20,7 @@ class TestAboutPage(TestCase):
 
         objects_number_initial = AboutPage.objects.all().count()
         self.assertEqual(objects_number_initial, 0)
+
         page = AboutPage.objects.create(
             discovery_url="http://www.test.pl/",
             parrent_website=self.website,
