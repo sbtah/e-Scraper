@@ -3,7 +3,7 @@ from random import randint
 
 
 def random_sleep_small():
-    """Custom sleep function that sleeps from 3 to 6 seconds"""
+    """Custom sleep function that sleeps from 1 to 3 seconds"""
 
     value = randint(1, 3)
 
@@ -19,7 +19,7 @@ def random_sleep_small_l2():
 
 
 def random_sleep_medium():
-    """Custom sleep function that sleeps from 3 to 6 seconds"""
+    """Custom sleep function that sleeps from 6 to 8 seconds"""
 
     value = randint(6, 8)
 
@@ -27,7 +27,7 @@ def random_sleep_medium():
 
 
 def random_sleep_large():
-    """Custom sleep function that sleeps from 3 to 6 seconds"""
+    """Custom sleep function that sleeps from 15 to 20 seconds"""
 
     value = randint(15, 20)
 
