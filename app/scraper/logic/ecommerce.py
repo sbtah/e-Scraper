@@ -78,10 +78,12 @@ class EcommerceScraper(BaseScraper):
         if if_banner_in_html:
             self.logger.info("WebElement found, closing...")
             try:
-                cookies_close_button = self.find_selenium_element(
+                element_close_button = self.find_selenium_element(
                     xpath_to_search=xpath_to_search
                 )
-                self.initialize_html_element(cookies_close_button)
+                self.initialize_html_element(
+                    selenium_element=element_close_button,
+                )
                 self.logger.info("Successfully closed WebElement.")
             except Exception as e:
                 self.logger.error(f"(close_selenium_element) Some other exception: {e}")
