@@ -27,7 +27,6 @@ class CategoryPage(WebPage):
         fifth = 5
         sixth = 6
 
-    # Sometimes entire Category can be redirected...
     category_nesting_level = models.IntegerField(
         choices=NestLevel.choices,
         validators=[MinValueValidator(1), MaxValueValidator(6)],
