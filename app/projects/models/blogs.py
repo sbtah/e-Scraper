@@ -4,18 +4,13 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class BlogPage(WebPage):
-    """Class for BlogPage object."""
+    """Class for BlogPage object where all BlogArticlePages are located."""
 
-    blog_title = models.CharField(max_length=255, unique=True)
-    blog_author = models.CharField(max_length=255)
-    blog_tags = ArrayField(
-        models.CharField(max_length=100, blank=True),
-        blank=True,
-        null=True,
-    )
-    date_published = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    main_title = models.CharField(max_length=100, blank=True)
+    main_description = models.TextField(blank=True)
     last_discovery = models.DateTimeField(blank=True, null=True)
     last_scrape = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.blog_title
+        return self.discovery_url
