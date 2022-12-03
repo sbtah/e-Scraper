@@ -5,6 +5,7 @@
 
 # Docker
 .docker
+Dockerfile
 
 # Python
 scraper/__pycache__/
@@ -15,3 +16,4 @@ scraper/*/*/*/__pycache__/
 .venv/
 venv/
 .ash_history
+redis_data

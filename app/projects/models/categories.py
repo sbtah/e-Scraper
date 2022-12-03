@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from projects.models.webpages import WebPage
-
+from projects.models.products import ProductPage
 
 # TODO:
 # Design an algorythmic way of generating ID numbers
@@ -33,7 +33,7 @@ class CategoryPage(WebPage):
         blank=True,
         null=True,
     )
-    is_active = models.BooleanField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
     category_description = models.TextField(blank=True)
     # Some Categories can be childs of other Categories.
     parrent_category = models.ForeignKey(
@@ -43,7 +43,8 @@ class CategoryPage(WebPage):
     last_scrape = models.DateTimeField(blank=True, null=True)
     related_categories_last_discovery = models.DateTimeField(blank=True, null=True)
     related_products_last_discovery = models.DateTimeField(blank=True, null=True)
-    products = models.ManyToManyField("ProductPage", blank=True)
+    # Same ProductPage can be in many different CategoryPages.
+    products = models.ManyToManyField(ProductPage, blank=True)
 
     def __str__(self):
         return self.category_name
