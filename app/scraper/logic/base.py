@@ -275,7 +275,6 @@ class BaseScraper:
         """
         Used with Selenium driver.
         Initialize a part of content that is loaded on click.
-        Returns HTMLElement on success that can be parsed if other methods.
         ::param xpath_to_click::
             - Xpath to element that we have to click to
                 load desired element (ie: modal?).
@@ -286,6 +285,7 @@ class BaseScraper:
             selenium_element.click()
             self.logger.debug("Successfully clicked on specified element.")
             random_sleep_small_l2()
+            return True
         except NoSuchElementException:
             self.logger.error(
                 "Failed at finding element to click. Maybe element was already clicked?"  # noqa
@@ -349,8 +349,9 @@ class BaseScraper:
         Finds all main Urls and 'Names' in given HtmlElements.
         Returns generator of tuples, containing (url, name).
         :param xpath_to_search: Xpath that should return list of <a> tags.
-        :param url_name_attr: Can be set to 'text' or 'title',
-            - or some other argument in HTML tag where data is located.
+        :param url_name_attr:
+            - Can be set to 'text' or 'title',
+                or some other argument in HTML tag where data is located.
         """
         categories_list = self.find_selenium_elements(
             xpath_to_search=xpath_to_search,
