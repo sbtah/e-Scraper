@@ -22,6 +22,8 @@ class ProductPage(WebPage):
 class ProductData(models.Model):
     """
     Class for Product object. Product data is always related to ProductPage.
+    ProductData will be scraped daily, so ProductPage will contain different
+        ProductData for each day.
     """
 
     # ProductData is stored for each day.

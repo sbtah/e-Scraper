@@ -1,26 +1,12 @@
 from scraper.sites.kiddymoon import KiddyMoon
 from scraper.sites.castorama import Castorama
+from scraper.logic.scraping_scraper import ScrapingScraper
 import time
 from urllib.parse import urljoin
 from lxml.html import tostring
 import importlib
 from scraper.helpers.check_time import calculate_time
 from scraper.helpers.logger import logger
-
-# from projects.tasks import scraping_task_products, scraping_task_scroll
-
-# websites = [
-#     ("kiddymoon", "KiddyMoon"),
-#     ("castorama", "Castorama"),
-# ]
-
-# for website in websites:
-#     try:
-#         module = importlib.import_module(f"scraper.sites.{website[0]}")
-#         my_class = getattr(module, f"{website[1]}")
-#         print(my_class)
-#     except ModuleNotFoundError:
-#         print(f"Module was not found: {website[0]}")
 
 
 products_urls_kiddy = [
@@ -33,11 +19,13 @@ products_urls_kiddy = [
     # "https://kiddymoon.pl/pl/menu/zabawki-1467.html",
     # "https://kiddymoon.pl/pl/menu/pokoj-dzieciecy-1474.html",
 ]
-# products_url_casto = "https://www.castorama.pl/produkty/urzadzanie/zarowki-i-swietlowki/zarowki-led.html"  # noqa
+
+products_urls_casto = [
+    "https://www.castorama.pl/produkty/urzadzanie/zarowki-i-swietlowki/zarowki-led.html",
+]  # noqa
 
 
-@calculate_time
-def scraping_task_products():
+def find_product_data():
     with KiddyMoon() as scraper:
         for url in products_urls_kiddy:
             response = scraper.selenium_get(
@@ -45,9 +33,9 @@ def scraping_task_products():
             )
             element = scraper.parse_response(response=response)
             scraper.close_cookies_banner(element=element)
-            products = scraper.find_products_for_all_pages_selenium()
+            products = scraper.find_product_pages_for_all_pages_selenium()
             for prod in products:
-                print(prod)
+                prod
             scraper.do_cleanup()
 
 
@@ -76,7 +64,7 @@ def scraping_task_scroll():
 
 
 if __name__ == "__main__":
-    scraping_task_products()
+    find_product_data()
 
 ### GET ELEMENT WITH SELENIUM
 # response = scraper.selenium_get(scraper.main_url)
