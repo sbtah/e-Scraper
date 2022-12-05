@@ -1,5 +1,5 @@
 import time
-from random import randint
+from random import randint, choice
 
 
 def random_sleep_small():
@@ -32,3 +32,9 @@ def random_sleep_large():
     value = randint(15, 20)
 
     return time.sleep(value)
+
+
+def get_random_user_agent(user_agent_list):
+    """Return random User-Agent"""
+    agent = choice(user_agent_list)
+    return agent
