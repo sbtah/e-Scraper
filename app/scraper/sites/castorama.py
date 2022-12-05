@@ -1,7 +1,7 @@
-from scraper.logic.ecommerce import EcommerceScraper
+from scraper.logic.scraping_scraper import ScrapingScraper
 
 
-class Castorama(EcommerceScraper):
+class Castorama(ScrapingScraper):
     """
     Specialized scraper for KiddyMoon store.
     """
