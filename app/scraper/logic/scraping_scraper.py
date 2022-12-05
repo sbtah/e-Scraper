@@ -33,13 +33,14 @@ class ScrapingScraper(EcommerceScraper):
 
     def visit_web_page(self, url):
         """
-        Requests specified url, gathers and returns meta data, closes cookies policy banner.
+        Requests specified url, closes cookies policy banner.
+        Returns dictionary of Meta Data from requested WebPage.
         """
+
         response = self.selenium_get(url=url)
         element = self.parse_response(response=response)
         meta_data = self.extract_meta_data(html_element=element)
         self.close_cookies_banner(element=element)
-
         return meta_data
 
     def extract_meta_data(self, html_element):
@@ -127,7 +128,6 @@ class ScrapingScraper(EcommerceScraper):
         meta_data = self.visit_web_page(url=self.main_url)
         element = self.parse_driver_response()
         home_page_dict["meda_data"] = meta_data
-        self.close_cookies_banner(element=element)
         # TODO :
         # ADD Extracting of HomePage data
 
