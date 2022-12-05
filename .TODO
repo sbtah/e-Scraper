@@ -1,4 +1,5 @@
 Scraper:
+    !Finished
     - Add scrape metadata method. that will be called on every requested page.
     should return values: 
         - discovery_url,
@@ -6,4 +7,15 @@ Scraper:
         - meta_author,
         - meta_description,
         - canonical_url,
-        - seo_title, 
+        - seo_title,
+
+    !Finished
+    - Add checking mechanism for validating if found URL exists, before actually calling it with Selenium.
+    python get request that returns status codes:
+        - returns status code upon which further scraping depends.
+
+    !Finished
+    - Add randomization mechanic for User Agents.
+    each get request should use differen User Agent:
+        - Add helper function that will randomly pick User Agent from a list,
+        - Add settings.py that will hold important settings for Scrapers/Crawlers.
