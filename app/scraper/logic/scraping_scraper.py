@@ -46,7 +46,7 @@ class ScrapingScraper(EcommerceScraper):
     def extract_meta_data(self, html_element):
         """
         Takes HtmlElement.
-        Extracts Meta Data from page, explicitly sets data type to str.
+        Extracts Meta Data from page, explicitly sets each data's type to str.
         Returns dictionary of data that will be used in creation of WebPage objects.
         """
         meta_dict = {}
@@ -117,12 +117,11 @@ class ScrapingScraper(EcommerceScraper):
         """"""
         pass
 
-    def scrape_home_page(self):
+    def scrape_home_page(self, root_categories_on_home=True):
         """
         Request Website by self.main_url.
         Returns dictionary of data for HomePage object.
         """
-
         home_page_dict = {}
 
         meta_data = self.visit_web_page(url=self.main_url)
