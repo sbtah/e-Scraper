@@ -1,10 +1,11 @@
+import time
+
 from scraper.helpers.randoms import (
     random_sleep_medium,
     random_sleep_small,
     random_sleep_small_l2,
 )
 from scraper.logic.base import BaseScraper
-import time
 
 
 class EcommerceScraper(BaseScraper):
@@ -61,6 +62,11 @@ class EcommerceScraper(BaseScraper):
         Return generator of tuples for ProductPage: (url, name).
         self.products_discovery_xpath_dict have to be configured,
             with ProductPage related xpathses.
+
+        Sometimes products can be displayed differently in different CategoryPage.
+        :param category_level: is used here to link Xpathses for products with proper category.
+        For instance: If child category (level=2) is displaying product data, then we fetch
+            self.products_discovery_xpath_dict for key '2' in dictionary of Xpathses.
         """
         if self.all_products_xpath and self.products_names_attribute_xpath:
             products = self.extract_urls_with_names(
