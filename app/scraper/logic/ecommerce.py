@@ -9,107 +9,75 @@ import time
 
 class EcommerceScraper(BaseScraper):
     """
-    General Ecommerce Scraper.
+    General Discovery Scraper.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     @property
-    def main_url(self):
-        """Main url of tracked site."""
-        return ""
-
-    @property
-    def main_categories_xpath(self):
-        """Should return Xpath that will return list of <a> tags."""
-        return ""
-
-    @property
-    def all_products_xpath(self):
-        """Xpath that returns list of all product's <a> tags."""
-        return ""
-
-    @property
-    def products_names_attribute_xpath(self):
-        """Xpath that product's name from url. Example: text(), or @title"""
-        return ""
-
-    @property
-    def products_names_attribute_name(self):
+    def categories_discovery_xpath_dict(self):
         """
-        Attribute for product name from url. Example: text, or title
-        Used with selenium webelements.
+        Dictionary of needed Xpaths and settings for discoverying CategoryPages.
+        CategoryPages can have other Categories as a childs.
+        Main (root) Categories are mapped to 1 while childs are 2, 3, 4 and so on.
+        :param category_url_xpath: Must return enitre <a> tag.
+        :param category_name_xpath: Is used for extracting CategoryPage name from Url.
         """
-        return ""
+        return {
+            1: {
+                "category_url_xpath": "",
+                "category_name_xpath": "",
+                "with_products": False,
+            },
+        }
 
     @property
-    def current_product_page_xpath(self):
-        """Explicit Xpath that returns value of current product page"""
-        return ""
+    def products_discovery_xpath_dict(self):
+        """
+        Dictionary of needed Xpaths and settings for discoverying ProductPages.
+        ProductsPages are mapped to CategoryPage level by key.
+        :param product_url_xpath: Must return enitre <a> tag.
+        :param product_name_xpath: Is used for extracting ProductPage name from Url.
+        """
+        return {
+            1: {
+                "product_url_xpath": "",
+                "product_name_xpath": "",
+                "product_next_page_button_xpath": "",
+                "product_current_page_xpath": "",
+                "product_last_page_xpath": "",
+                "product_previous_page_xpath": "",
+            },
+        }
 
-    @property
-    def last_product_page_xpath(self):
-        """Explicit Xpath that returns value of last product page"""
-        return ""
-
-    @property
-    def next_product_page_button_xpath(self):
-        """Explicit Xpath that returns value of last product page"""
-        return ""
-
-    @property
-    def cookies_close_xpath(self):
-        """Xpath to element that closes cookies banner on click."""
-        return ""
-
-    def close_cookies_banner(self, element):
+    def find_all_category_pages_by_level(self, html_element, level=1):
         """"""
-        self.close_selenium_element(
-            element=element,
-            xpath_to_search=self.cookies_close_xpath,
-        )
+        pass
 
-    def close_selenium_element(self, element, xpath_to_search):
-        """"""
-        if_banner_in_html = self.if_xpath_in_element(
-            html_element=element, xpath_to_search=xpath_to_search
-        )
-        if if_banner_in_html:
-            self.logger.info("WebElement found, closing...")
-            try:
-                element_close_button = self.find_selenium_element(
-                    xpath_to_search=xpath_to_search
-                )
-                self.initialize_html_element(
-                    selenium_element=element_close_button,
-                )
-                self.logger.info("Successfully closed WebElement.")
-            except Exception as e:
-                self.logger.error(f"(close_selenium_element) Some other exception: {e}")
-        else:
-            self.logger.info("No WebElement to click, passing...")
-
-    def find_all_products(self, html_element):
+    def find_all_product_pages(self, html_element, category_level=1):
         """
         Given then HtmlElement.
-        Return generator of tuples for product's (url, name).
-        You need to configure:
-        self.all_products_xpath,
-        self.product_names_attribute_xpath.
+        Return generator of tuples for ProductPage: (url, name).
+        self.products_discovery_xpath_dict have to be configured,
+            with ProductPage related xpathses.
         """
         if self.all_products_xpath and self.products_names_attribute_xpath:
             products = self.extract_urls_with_names(
                 html_element=html_element,
-                xpath_to_search=self.all_products_xpath,
-                name_attr_xpath=self.products_names_attribute_xpath,
+                xpath_to_search=self.products_discovery_xpath_dict[category_level][
+                    "product_url_xpath"
+                ],
+                name_attr_xpath=self.products_discovery_xpath_dict[category_level][
+                    "product_name_xpath"
+                ],
             )
             return products
         else:
             self.logger.error("(find_all_products) Missing critical Xpathses.")
             return None
 
-    def find_products_for_all_pages_selenium(self):
+    def find_product_pages_for_all_pages_selenium(self, category_level=1):
         """
         Parse all products for all pages in specified page.
         Relies on Selenium since it's only clicking on next page button.
@@ -126,19 +94,25 @@ class EcommerceScraper(BaseScraper):
         element = self.parse_driver_response()
         current_page_number_from_xpath = self.find_all_elements(
             html_element=element,
-            xpath_to_search=self.current_product_page_xpath,
+            # Current page Xpath
+            xpath_to_search=self.products_discovery_xpath_dict[category_level][
+                "product_current_page_xpath"
+            ],
             ignore_not_found_errors=True,
         )
         self.logger.info(
             f"Current page; XPath: {current_page_number_from_xpath[0].text_content().strip() if current_page_number_from_xpath != None else 1} Counted: {current_page}"
         )
 
-        products = self.find_all_products(html_element=element)
+        products = self.find_all_product_pages(html_element=element)
         for prod in products:
             yield prod
 
         next_page_button = self.find_selenium_element(
-            xpath_to_search=self.next_product_page_button_xpath,
+            # Next Page Xpath
+            xpath_to_search=self.products_discovery_xpath_dict[category_level][
+                "product_next_page_button_xpath"
+            ],
             ignore_not_found_errors=True,
         )
         while next_page_button is not None:
@@ -146,7 +120,10 @@ class EcommerceScraper(BaseScraper):
             self.logger.info(f"Found another product page, proceeding.")
             self.initialize_html_element(next_page_button)
             next_page_button = self.find_selenium_element(
-                xpath_to_search=self.next_product_page_button_xpath,
+                # Next Page Xpath
+                xpath_to_search=self.products_discovery_xpath_dict[category_level][
+                    "product_next_page_button_xpath"
+                ],
                 ignore_not_found_errors=True,
             )
 
@@ -154,14 +131,17 @@ class EcommerceScraper(BaseScraper):
             new_element = self.parse_driver_response()
             current_page_number_from_xpath = self.find_all_elements(
                 html_element=new_element,
-                xpath_to_search=self.current_product_page_xpath,
+                # Current Page Xpath
+                xpath_to_search=self.products_discovery_xpath_dict[category_level][
+                    "product_current_page_xpath"
+                ],
                 ignore_not_found_errors=True,
             )
             self.logger.info(
                 f"Current page; XPath: {current_page_number_from_xpath[0].text_content().strip() if current_page_number_from_xpath != None else 1} Counted: {current_page}"
             )
 
-            products = self.find_all_products(html_element=element)
+            products = self.find_all_product_pages(html_element=element)
             for prod in products:
                 yield prod
 
