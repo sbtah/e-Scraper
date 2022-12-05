@@ -25,7 +25,6 @@ class BaseScraper:
         self.teardown = True
         self.logger = logger
         self.time_started = datetime.now()
-        self.logger.info(f"Started scraper for : '{self.main_url}'")
 
     def __str__(self):
         return "Base Scraper"
@@ -47,6 +46,11 @@ class BaseScraper:
     @property
     def user_agent(self):
         return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"  # noqa
+
+    @property
+    def cookies_close_xpath(self):
+        """Xpath to element that closes cookies banner on click."""
+        return ""
 
     @property
     def driver(self):
@@ -384,7 +388,7 @@ class BaseScraper:
             selenium_element.send_keys(Keys.ENTER)
             random_sleep_small()
             self.logger.info(
-                f"Successfuly send text: '{text}' to desired element.",
+                f"Successfully send text: '{text}' to desired element.",
             )
         except ElementNotVisibleException:
             self.logger.error("Specified element is not visible.")
@@ -400,10 +404,40 @@ class BaseScraper:
         actions = ActionChains(self._driver)
         try:
             actions.move_to_element(selenium_element).perform()
-            self.logger.info(
-                f"Successfuly scrolled to desired element.",
+            self.logger.debug(
+                f"Successfully scrolled to desired element.",
             )
         except Exception as e:
             self.logger.error(
                 f"(scroll_to_element) Some other exception: {e}",
             )
+
+    def close_selenium_element(self, element, xpath_to_search):
+        """"""
+        if_banner_in_html = self.if_xpath_in_element(
+            html_element=element, xpath_to_search=xpath_to_search
+        )
+        if if_banner_in_html:
+            self.logger.info("WebElement found, closing...")
+            try:
+                element_close_button = self.find_selenium_element(
+                    xpath_to_search=xpath_to_search
+                )
+                self.initialize_html_element(
+                    selenium_element=element_close_button,
+                )
+                self.logger.info("Successfully closed WebElement.")
+            except Exception as e:
+                self.logger.error(f"(close_selenium_element) Some other exception: {e}")
+        else:
+            self.logger.info("No WebElement to click, passing...")
+
+    def close_cookies_banner(self, element):
+        """
+        Finds Cookies Policy in provided HtmlElement and closes it.
+        Needs self.cookies_close_xpath to work.
+        """
+        self.close_selenium_element(
+            element=element,
+            xpath_to_search=self.cookies_close_xpath,
+        )
