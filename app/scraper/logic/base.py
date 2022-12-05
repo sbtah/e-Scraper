@@ -3,7 +3,12 @@ from urllib.parse import urljoin
 
 from lxml.html import HTMLParser, document_fromstring, fromstring
 from scraper.helpers.logger import logger
-from scraper.helpers.randoms import random_sleep_small, random_sleep_small_l2
+from scraper.helpers.randoms import (
+    get_random_user_agent,
+    random_sleep_small,
+    random_sleep_small_l2,
+)
+from scraper.options.settings import USER_AGENTS
 from selenium import webdriver
 from selenium.common.exceptions import (
     ElementNotVisibleException,
@@ -37,15 +42,10 @@ class BaseScraper:
             self.driver.delete_all_cookies()
             self.driver.quit()
 
-    def get_random_user_agent(self):
-        pass
-
-    def get_random_proxy(self):
-        pass
-
     @property
     def user_agent(self):
-        return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"  # noqa
+        agent = get_random_user_agent(USER_AGENTS)
+        return agent
 
     @property
     def cookies_close_xpath(self):
@@ -61,7 +61,7 @@ class BaseScraper:
             options.add_argument("--height=1080")
             # TODO:
             # Call get_random_user_agent to use different User-Agent server on each request..
-            options.add_argument(self.user_agent)
+            options.add_argument(f"user-agent=[{self.user_agent}]")
             options.add_argument("--no-sandbox")
 
             options.add_argument("--single-process")
@@ -347,13 +347,13 @@ class BaseScraper:
             self.logger.info(f"Failed loading URLS/Names list from HTML,")
             return None
 
-    def extract_urls_with_names_selenium(self, xpath_to_search, url_name_attr):
+    def extract_urls_with_names_selenium(self, xpath_to_search, name_attr_xpath):
         """
         Used for traversing page's url structure.
         Finds all main Urls and 'Names' in given HtmlElements.
         Returns generator of tuples, containing (url, name).
-        :param xpath_to_search: Xpath that should return list of <a> tags.
-        :param url_name_attr:
+        :param xpath_to_search: - Xpath that should return list of <a> tags.
+        :param name_attr_xpath:
             - Can be set to 'text' or 'title',
                 or some other argument in HTML tag where data is located.
         """
@@ -368,7 +368,7 @@ class BaseScraper:
             return (
                 (
                     x.get_attribute("href"),
-                    x.get_attribute(f"{url_name_attr}"),
+                    x.get_attribute(f"{name_attr_xpath}"),
                 )
                 for x in categories_list
             )
