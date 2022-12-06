@@ -2,6 +2,7 @@ from datetime import datetime
 from urllib.parse import urljoin
 
 from lxml.html import HTMLParser, document_fromstring, fromstring
+from scraper.helpers.cleaners import modify_xpath_attr_to_text
 from scraper.helpers.logger import logger
 from scraper.helpers.randoms import (
     get_random_user_agent,
@@ -161,9 +162,9 @@ class BaseScraper:
 
     def do_cleanup(self):
         """
-        Delete all cookies and refresh browser and quit Selenium driver.
+        Delete all cookies and quit Selenium driver.
         """
-        if self.driver:
+        if self._driver:
             self.driver.delete_all_cookies()
 
             self.driver.quit()
@@ -347,13 +348,13 @@ class BaseScraper:
             self.logger.info(f"Failed loading URLS/Names list from HTML,")
             return None
 
-    def extract_urls_with_names_selenium(self, xpath_to_search, name_attr_xpath):
+    def extract_urls_with_names_selenium(self, xpath_to_search, name_attr):
         """
         Used for traversing page's url structure.
         Finds all main Urls and 'Names' in given HtmlElements.
         Returns generator of tuples, containing (url, name).
         :param xpath_to_search: - Xpath that should return list of <a> tags.
-        :param name_attr_xpath:
+        :param name_attr:
             - Can be set to 'text' or 'title',
                 or some other argument in HTML tag where data is located.
         """
@@ -368,7 +369,7 @@ class BaseScraper:
             return (
                 (
                     x.get_attribute("href"),
-                    x.get_attribute(f"{name_attr_xpath}"),
+                    x.get_attribute(f"{modify_xpath_attr_to_text(name_attr)}"),
                 )
                 for x in categories_list
             )
