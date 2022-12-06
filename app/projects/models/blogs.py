@@ -6,7 +6,6 @@ from django.contrib.postgres.fields import ArrayField
 class BlogPage(WebPage):
     """Class for BlogPage object where all BlogArticlePages are located."""
 
-    is_active = models.BooleanField(default=True)
     main_title = models.CharField(max_length=100, blank=True)
     main_description = models.TextField(blank=True)
     last_discovery = models.DateTimeField(blank=True, null=True)

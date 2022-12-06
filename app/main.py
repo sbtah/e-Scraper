@@ -14,7 +14,7 @@ from scraper.helpers.logger import logger
 
 products_urls_kiddy = [
     # "https://kiddymoon.pl/",
-    # "https://kiddymoon.pl/pl/ntst.html",
+    "https://kiddymoon.pl/pl/ntst.html",
     "https://kiddymoon.pl/pl/menu/suche-baseny-1140.html",
     "https://kiddymoon.pl/pl/menu/pilki-do-basenu-1466.html",
     "https://kiddymoon.pl/pl/menu/place-zabaw-1480.html",
@@ -37,9 +37,28 @@ def find_product_data():
             with KiddyMoon() as scraper:
                 meta_data = scraper.visit_web_page(url=url)
                 print(f"USER-AGENT: {scraper.user_agent}")
-                products = scraper.find_product_pages_for_all_pages_selenium()
+                products = scraper.find_product_pages_for_all_pages_selenium(
+                    extract_with_selenium=True
+                )
                 for prod in products:
-                    prod
+                    print(prod)
+                scraper.do_cleanup()
+        else:
+            pass
+
+
+def find_category_data():
+    for url in products_urls_kiddy:
+        validation = ValidationCrawler().validate_page_status(url=url)
+        if validation:
+            with KiddyMoon() as scraper:
+                meta_data = scraper.visit_web_page(url=url)
+                element = scraper.parse_driver_response()
+                categories = scraper.find_all_category_pages(
+                    html_element=element, find_with_selenium=True
+                )
+                for cat in categories:
+                    print(cat)
                 scraper.do_cleanup()
         else:
             pass
@@ -51,6 +70,11 @@ def validate_page_status():
             response = scraper.python_get(url=url)
             print(response)
             print(type(response))
+
+
+def dumb_test():
+    with KiddyMoon() as scraper:
+        print(scraper.products_discovery_xpath_dict.get(2))
 
 
 def test_random_agent():

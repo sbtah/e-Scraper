@@ -19,11 +19,11 @@ Current Functionalities:
 - Extract Meta data froch each requested Page.
 - Parse CategoryPages with pagination and extract ProductPage data from each page.
 
-- Scrape products from specified store,
-- Track specified products or individual pages,
+Work in progress:
+- Scrape ProductData from specified ProductPage,
+- Track specified ProductPage and ProductData,
 - Generate XLSX rapports,
-- Send emails about changes on site,
-- Do basic SEO checks on tracked site,
+- Send emails about changes on WebPage,
+- Do basic SEO checks on Website,
 
 
-Project is in WIP state.

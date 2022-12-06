@@ -33,7 +33,6 @@ class CategoryPage(WebPage):
         blank=True,
         null=True,
     )
-    is_active = models.BooleanField(default=True)
     category_description = models.TextField(blank=True)
     # Some Categories can be childs of other Categories.
     parrent_category = models.ForeignKey(

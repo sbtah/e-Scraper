@@ -5,7 +5,6 @@ from projects.models.webpages import WebPage
 class HomePage(WebPage):
     """Class for Home Page object."""
 
-    is_active = models.BooleanField(default=True)
     main_title = models.CharField(max_length=100)
     main_description = models.TextField()
     last_scrape = models.DateTimeField(blank=True, null=True)

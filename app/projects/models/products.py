@@ -6,7 +6,6 @@ from django.contrib.postgres.fields import ArrayField
 class ProductPage(WebPage):
     """Class for ProductPage object where Product data is located."""
 
-    is_active = models.BooleanField(default=True)
     parrent_categories_pages = ArrayField(
         models.IntegerField(null=True, blank=True),
         blank=True,
