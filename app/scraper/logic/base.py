@@ -1,8 +1,6 @@
 from datetime import datetime
-from urllib.parse import urljoin
 
 from lxml.html import HTMLParser, document_fromstring, fromstring
-from scraper.helpers.cleaners import modify_xpath_attr_to_text
 from scraper.helpers.logger import logger
 from scraper.helpers.randoms import (
     get_random_user_agent,
