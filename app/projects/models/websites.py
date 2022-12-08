@@ -5,8 +5,6 @@ class Website(models.Model):
     """Base class for Website object."""
 
     domain = models.CharField(max_length=200, unique=True)
-    # Url from which scraping is starting.
-    main_url = models.CharField(max_length=200, unique=True)
     # Name of file for related Scraper.
     module_name = models.CharField(max_length=100)
     # Name of class for related Scraper.
