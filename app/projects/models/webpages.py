@@ -9,10 +9,10 @@ class WebPage(models.Model):
 
     # WebPages are instanciated by discovery url.
     discovery_url = models.CharField(max_length=255, unique=True)
-    # When Webpage is requested by it's discovery_url current_url is set.
+    # When Webpage is successfully requested by it's discovery_url - current_url is set.
     # Used because WebPages can be redirected to new URL.
     current_url = models.CharField(max_length=255, blank=True)
-    # If request suceeds WebPage is set to is_active to True or to False if fails.
+    # If request suceeds WebPage's is_active to True or to False if fails.
     is_active = models.BooleanField(default=False)
 
     seo_title = models.CharField(max_length=255, blank=True)

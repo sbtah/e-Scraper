@@ -10,11 +10,6 @@ class ScrapingScraper(EcommerceScraper):
         super().__init__(*args, **kwargs)
 
     @property
-    def main_url(self):
-        """Main url of tracked site leading to HomePage."""
-        return ""
-
-    @property
     def meta_xpath_dict(self):
         """Dictionary of Meta Data Xpathses."""
         return {
