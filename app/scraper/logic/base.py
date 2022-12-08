@@ -216,7 +216,7 @@ class BaseScraper:
         """
         Used with Selenium driver.
         Finds elements by specified Xpath.
-        Return Selenium elements to interact with.
+        Return Selenium web elements to interact with.
         :param ignore_not_found_errors:
             - Can be set to True to not produce error logs,
                 when elements are not found.
@@ -314,68 +314,78 @@ class BaseScraper:
             self.logger.error(f"(if_xpath_in_element), Exception: {e}")
             return None
 
-    def extract_urls_with_names(
-        self,
-        html_element,
-        xpath_to_search,
-        name_attr_xpath,
-    ):
-        """
-        Used for traversing page's url structure.
-        Finds all Urls and 'Names' in given HtmlElements.
-        Returns generator of tuples, containing (url, name).
-        :param xpath_to_search: Xpath that should return list of <a> tags.
-        :param name_xpath: Can be set to ./text() or @title,
-            - or some other argument in HTML tag where data is located.
-        """
-        categories_list = self.find_all_elements(
-            html_element=html_element,
-            xpath_to_search=xpath_to_search,
-        )
+    # # TODO:
+    # # ADD Parser integration.
+    # # Whole concept of returning generator of tuples stays.
+    # # But I need to parse HTMLElement coming from find_all_elements before I return generator.
+    # #
+    # def extract_urls_with_names(
+    #     self,
+    #     html_element,
+    #     xpath_to_search,
+    #     name_attr_xpath,
+    #     parser_used=None,
+    #     extract_with_selenium=False,
+    # ):
+    #     """
+    #     Used in discovery of WebPages Elements on current page.
+    #     Finds all Urls and 'Names' in given HtmlElements.
+    #     Returns generator of tuples, containing (url, name).
+    #     :param xpath_to_search: Xpath that should return list of <a> tags.
+    #     :param name_xpath: Can be set to ./text() or @title,
+    #         - or some other argument in HTML tag where data is located.
+    #     """
+    #     if extract_with_selenium == False:
+    #         categories_list = self.find_all_elements(
+    #             html_element=html_element,
+    #             xpath_to_search=xpath_to_search,
+    #         )
+    #     else:
+    #         categories_list = self.find_selenium_elements(
+    #             xpath_to_search=xpath_to_search,
+    #         )
 
-        if categories_list:
-            self.logger.info(
-                f"URLS/Names list created, returned {len(categories_list)} elements."  # noqa
-            )
-            return (
-                (
-                    urljoin(self.main_url, x.xpath(".//@href")[0]),
-                    x.xpath(name_attr_xpath)[0],
-                )
-                for x in categories_list
-            )
-        else:
-            self.logger.info(f"Failed loading URLS/Names list from HTML,")
-            return None
+    #     if categories_list:
+    #         self.logger.info(
+    #             f"URLS/Names list created, returned {len(categories_list)} elements."  # noqa
+    #         )
+    #         if extract_with_selenium == False:
+    #             return (parser_used(HtmlElement=x) for x in categories_list)
+    #         else:
+    #             return (parser_used(SeleniumWebElement=x) for x in categories_list)
+    #     else:
+    #         self.logger.info(f"Failed loading URLS/Names list from HTML,")
+    #         return None
 
-    def extract_urls_with_names_selenium(self, xpath_to_search, name_attr):
-        """
-        Used for traversing page's url structure.
-        Finds all main Urls and 'Names' in given HtmlElements.
-        Returns generator of tuples, containing (url, name).
-        :param xpath_to_search: - Xpath that should return list of <a> tags.
-        :param name_attr:
-            - Can be set to 'text' or 'title',
-                or some other argument in HTML tag where data is located.
-        """
-        categories_list = self.find_selenium_elements(
-            xpath_to_search=xpath_to_search,
-        )
+    ####
+    # def extract_urls_with_names_selenium(self, xpath_to_search, name_attr):
+    #     """
+    #     Used for traversing page's url structure.
+    #     Finds all main Urls and 'Names' in given HtmlElements.
+    #     Returns generator of tuples, containing (url, name).
+    #     :param xpath_to_search: - Xpath that should return list of <a> tags.
+    #     :param name_attr:
+    #         - Can be set to 'text' or 'title',
+    #             or some other argument in HTML tag where data is located.
+    #     """
+    #     categories_list = self.find_selenium_elements(
+    #         xpath_to_search=xpath_to_search,
+    #     )
 
-        if categories_list:
-            self.logger.info(
-                f"URLS/Names list created, returned {len(categories_list)} elements."
-            )
-            return (
-                (
-                    x.get_attribute("href"),
-                    x.get_attribute(f"{modify_xpath_attr_to_text(name_attr)}"),
-                )
-                for x in categories_list
-            )
-        else:
-            self.logger.info(f"Failed loading URLS/Names list from HTML,")
-            return None
+    #     if categories_list:
+    #         self.logger.info(
+    #             f"URLS/Names list created, returned {len(categories_list)} elements."
+    #         )
+    #         return (
+    #             (
+    #                 x.get_attribute("href"),
+    #                 x.get_attribute(f"{modify_xpath_attr_to_text(name_attr)}"),
+    #             )
+    #             for x in categories_list
+    #         )
+    #     else:
+    #         self.logger.info(f"Failed loading URLS/Names list from HTML,")
+    #         return None
 
     def send_text_to_element(self, text, selenium_element):
         """
