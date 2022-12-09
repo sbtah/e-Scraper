@@ -1,3 +1,8 @@
+Project wide:
+    - Add RabbitMQ as a message broker,
+    - Add pytest, pytest-django, pytest-cov,
+    - Write tests for models before starting and integration of data coming from scrapers.
+
 Scraper:
     !Finished
     - Add scrape metadata method. that will be called on every requested page.
@@ -19,3 +24,6 @@ Scraper:
     each get request should use differen User Agent:
         - Add helper function that will randomly pick User Agent from a list,
         - Add settings.py that will hold important settings for Scrapers/Crawlers.
+
+
+
