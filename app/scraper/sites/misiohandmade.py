@@ -50,13 +50,36 @@ class MisioHandMade(ScrapingScraper):
             },
         }
 
+    @property
+    def products_discovery_xpath_dict(self):
+        return {
+            1: {
+                "product_url_xpath": './/div[contains(@class, "products")]/div[contains(@class, "card product")]',
+                "product_next_page_button_xpath": './/nav[@class="pagination"]/div[./a[contains(@class,  "next")]]',
+                "product_current_page_xpath": './/nav[@class="pagination"]/div[./span[contains(@class, "current")]]/span',
+                "product_last_page_xpath": "",
+                "product_previous_page_xpath": "",
+            },
+        }
+
     def parse_category_level_1_elements(
         self,
-        HtmlElement=None,
-        SeleniumWebElement=None,
+        HtmlElement,
+        SeleniumWebElement,
     ):
-        # category_url = HtmlElement.xpath("./@href")[0]
-        # category_name = HtmlElement.xpath("./h5/text()")[0]
-        category_url = SeleniumWebElement.get_attribute("href")
-        category_name = SeleniumWebElement.get_attribute("text").strip()
+        category_url = HtmlElement.xpath("./@href")[0]
+        category_name = HtmlElement.xpath("./h5/text()")[0]
         return category_url, category_name
+
+    def parse_product_level_1_elements(
+        self,
+        HtmlElement,
+        SeleniumWebElement,
+    ):
+        product_url = HtmlElement.xpath(
+            './div[@class="card__hover"]/a[contains(@class, "product__link")]/@href'
+        )[0]
+        product_name = HtmlElement.xpath(
+            './h2[contains(@class, "product__title")]/text()'
+        )[0]
+        return product_url, product_name
