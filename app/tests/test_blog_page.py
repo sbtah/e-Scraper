@@ -1,51 +1,56 @@
-from django.test import TestCase
+import pytest
 from projects.models.blogs import BlogPage
-from projects.models.websites import Website
+from projects.models.webpages import WebPage
 
 
-class TestBlogPage(TestCase):
+pytestmark = pytest.mark.django_db
+
+
+class TestBlogPageModel:
     """Test cases for BlogPage object."""
 
-    def setUp(self):
+    def test_blog_page_can_be_created(self, example_website):
+        """Test that BlogPage object is created"""
 
-        self.website = Website.objects.create(
-            domain="test.com",
-            main_url="http://test.com/",
-            module_name="test",
-            scraper_class="Test",
+        website = example_website
+        assert BlogPage.objects.all().count() == 0
+        blog_page = BlogPage.objects.create(
+            discovery_url="http://test.com/",
+            current_url="http://test.com/",
+            is_active=True,
+            seo_title="TestWeb",
+            meta_description="Test Meta",
+            canonical_url="http://test.com/",
+            parrent_website=website,
+            main_title="Our Test Blogs",
+            main_description="Test...",
         )
+        assert BlogPage.objects.all().count() == 1
+        assert blog_page.parrent_website.domain == "test.com"
+        assert isinstance(blog_page, BlogPage)
+        assert isinstance(blog_page, WebPage)
 
-    def test_blog_page_is_created(self):
-        """Test that BlogPage can be created."""
+    def test_discovery_url_must_be_unique(self, example_blog_page, example_website):
+        """Test that each BlogPage have uniqe discovery_url"""
 
-        objects_number_inital = BlogPage.objects.all().count()
-        self.assertEqual(objects_number_inital, 0)
+        website = example_website
+        blog_page_1 = example_blog_page
 
-        page = BlogPage.objects.create(
-            discovery_url="http://test.pl",
-            parrent_website=self.website,
-            blog_title="Test title",
-            blog_author="Author",
-            blog_tags=["funny", "test"],
-            date_published="2022-11-22",
-            last_discovery="2022-11-22",
-            last_scrape="2022-11-22",
-        )
-        objects_number_after = BlogPage.objects.all().count()
-        self.assertEqual(objects_number_after, 1)
-        self.assertTrue(isinstance(page, BlogPage))
+        with pytest.raises(Exception):
+            blog_page_2 = BlogPage.objects.create(
+                discovery_url="http://test.com/",
+                current_url="http://test.com/",
+                is_active=True,
+                seo_title="TestWeb",
+                meta_description="Test Meta",
+                canonical_url="http://test.com/",
+                parrent_website=website,
+                main_title="Our Test Blogs",
+                main_description="Test...",
+            )
 
-    def test_str_method(self):
-        """Test that BlogPage object generates proper __str__."""
+    def test_str_method_returns_proper_data(sel, example_blog_page):
+        """Test that __str__ for object is properly returning data."""
 
-        page = BlogPage.objects.create(
-            discovery_url="http://test.pl",
-            parrent_website=self.website,
-            blog_title="Test title",
-            blog_author="Author",
-            blog_tags=["funny", "test"],
-            date_published="2022-11-22",
-            last_discovery="2022-11-22",
-            last_scrape="2022-11-22",
-        )
-        self.assertEqual(page.blog_title, str(page))
+        blog_page = example_blog_page
+        assert str(blog_page) == blog_page.discovery_url
