@@ -5,6 +5,16 @@ from projects.models.about import AboutPage
 
 
 @pytest.fixture
+def website_create_test_data():
+    return {
+        "domain": "test.com",
+        "is_monitored": True,
+        "module_name": "teststore",
+        "scraper_class": "TestStore",
+    }
+
+
+@pytest.fixture
 def example_website():
     example_website = Website.objects.create(
         domain="test.com",
@@ -13,6 +23,20 @@ def example_website():
         scraper_class="TestStore",
     )
     return example_website
+
+
+@pytest.fixture
+def blog_page_create_test_data():
+    return {
+        "discovery_url": "http://test.com/",
+        "current_url": "http://test.com/",
+        "is_active": True,
+        "seo_title": "TestWeb",
+        "meta_description": "Test Meta",
+        "canonical_url": "http://test.com/",
+        "main_title": "Our Test Blogs",
+        "main_description": "Test...",
+    }
 
 
 @pytest.fixture
