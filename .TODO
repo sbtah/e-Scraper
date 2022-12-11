@@ -10,6 +10,7 @@ Project wide:
     ...
     * Integrate rapport-Handler app that will process data from database and create XLSX rapports.
     * Rapport should be send daily/monthly/yearly via email.
+    * Learn how to test Scrapers...
 
 Scraper:
     !Finished
