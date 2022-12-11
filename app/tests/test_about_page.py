@@ -31,11 +31,13 @@ class TestAboutPageModel:
         assert isinstance(about_page, AboutPage)
         assert isinstance(about_page, WebPage)
 
+    @pytest.mark.django_db(transaction=True)
     def test_discovery_url_must_be_unique(self, example_about_page, example_website):
-        """Test that each BlogPage have uniqe discovery_url"""
+        """Test that each BlogPage have unique discovery_url"""
 
         website = example_website
         about_page_1 = example_about_page
+
         with pytest.raises(Exception):
             about_page_2 = AboutPage.objects.create(
                 discovery_url="http://test.com/about",

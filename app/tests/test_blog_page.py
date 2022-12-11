@@ -30,8 +30,9 @@ class TestBlogPageModel:
         assert isinstance(blog_page, BlogPage)
         assert isinstance(blog_page, WebPage)
 
+    @pytest.mark.django_db(transaction=True)
     def test_discovery_url_must_be_unique(self, example_blog_page, example_website):
-        """Test that each BlogPage have uniqe discovery_url"""
+        """Test that each BlogPage have unique discovery_url"""
 
         website = example_website
         blog_page_1 = example_blog_page
@@ -48,6 +49,7 @@ class TestBlogPageModel:
                 main_title="Our Test Blogs",
                 main_description="Test...",
             )
+        assert BlogPage.objects.all().count() == 1
 
     def test_str_method_returns_proper_data(sel, example_blog_page):
         """Test that __str__ for object is properly returning data."""
