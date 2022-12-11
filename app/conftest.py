@@ -57,6 +57,20 @@ def example_blog_page(example_website):
 
 
 @pytest.fixture
+def about_page_create_test_data():
+    return {
+        "discovery_url": "http://test.com/about",
+        "current_url": "http://test.com/about",
+        "is_active": True,
+        "seo_title": "Test About",
+        "meta_description": "Test Meta",
+        "canonical_url": "http://test.com/about",
+        "main_title": "Test About",
+        "main_description": "Sample about us text...",
+    }
+
+
+@pytest.fixture
 def example_about_page(example_website):
     website = example_website
     example_about_page = AboutPage.objects.create(
@@ -65,7 +79,7 @@ def example_about_page(example_website):
         is_active=True,
         seo_title="Test About",
         meta_description="Test Meta",
-        canonical_url="http://test.com/",
+        canonical_url="http://test.com/about",
         parrent_website=website,
         main_title="Test About",
         main_description="Sample about us text...",
