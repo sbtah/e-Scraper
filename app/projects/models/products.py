@@ -11,11 +11,9 @@ class ProductPage(WebPage):
         blank=True,
         null=True,
     )
-    last_discovery = models.DateTimeField(blank=True, null=True)
-    last_scrape = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.discovery_url}"
+        return f"ProductPage: {self.discovery_url}"
 
 
 class ProductData(models.Model):
@@ -26,6 +24,7 @@ class ProductData(models.Model):
     """
 
     # ProductData is stored for each day.
+    # So whenever we scrape the ProductPage new ProductData will be created.
     date_of_scrape = models.DateTimeField(auto_now_add=True)
     product_name = models.CharField(max_length=255)
     product_description = models.TextField(blank=True)

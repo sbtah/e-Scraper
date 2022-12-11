@@ -38,8 +38,6 @@ class CategoryPage(WebPage):
     parrent_category = models.ForeignKey(
         "self", on_delete=models.SET_NULL, blank=True, null=True
     )
-    last_discovery = models.DateTimeField(blank=True, null=True)
-    last_scrape = models.DateTimeField(blank=True, null=True)
     related_categories_last_discovery = models.DateTimeField(blank=True, null=True)
     related_products_last_discovery = models.DateTimeField(blank=True, null=True)
     # Same ProductPage can be in many different CategoryPages.
