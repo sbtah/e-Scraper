@@ -1,47 +1,56 @@
-from django.test import TestCase
+import pytest
 from projects.models.about import AboutPage
-from projects.models.websites import Website
+from projects.models.webpages import WebPage
 
 
-class TestAboutPage(TestCase):
+pytestmark = pytest.mark.django_db
+
+
+class TestAboutPageModel:
     """Test cases for AboutPage object."""
 
-    def setUp(self):
+    def test_about_page_can_be_created(self, example_website):
+        """Test that AboutPage can be created"""
 
-        self.website = Website.objects.create(
-            domain="test.com",
-            main_url="http://test.com/",
-            module_name="test",
-            scraper_class="Test",
+        website = example_website
+
+        assert AboutPage.objects.all().count() == 0
+        about_page = AboutPage.objects.create(
+            discovery_url="http://test.com/about",
+            current_url="http://test.com/about",
+            is_active=True,
+            seo_title="Test About",
+            meta_description="Test Meta",
+            canonical_url="http://test.com/",
+            parrent_website=website,
+            main_title="Test About",
+            main_description="Sample about us text...",
         )
+        assert AboutPage.objects.all().count() == 1
+        assert about_page.parrent_website.domain == "test.com"
+        assert isinstance(about_page, AboutPage)
+        assert isinstance(about_page, WebPage)
 
-    def test_about_page_is_created(self):
-        """Test that AboutPage object can be created."""
+    def test_discovery_url_must_be_unique(self, example_about_page, example_website):
+        """Test that each BlogPage have uniqe discovery_url"""
 
-        objects_number_initial = AboutPage.objects.all().count()
-        self.assertEqual(objects_number_initial, 0)
+        website = example_website
+        about_page_1 = example_about_page
+        with pytest.raises(Exception):
+            about_page_2 = AboutPage.objects.create(
+                discovery_url="http://test.com/about",
+                current_url="http://test.com/about",
+                is_active=True,
+                seo_title="Test About",
+                meta_description="Test Meta",
+                canonical_url="http://test.com/",
+                parrent_website=website,
+                main_title="Test About",
+                main_description="Sample about us text...",
+            )
 
-        page = AboutPage.objects.create(
-            discovery_url="http://www.test.pl/",
-            parrent_website=self.website,
-            main_title="Test",
-            main_description="Test Description",
-            last_discovery="2022-11-22",
-            last_scrape="2022-11-22",
-        )
-        objects_number_after = AboutPage.objects.all().count()
-        self.assertEqual(objects_number_after, 1)
-        self.assertTrue(isinstance(page, AboutPage))
+    def test_str_method_returns_proper_data(sel, example_about_page):
+        """Test that __str__ for object is properly returning data."""
 
-    def test_str_method(self):
-        """Test that AboutPage object generates proper __str__"""
-
-        page = AboutPage.objects.create(
-            discovery_url="http://www.test.pl/",
-            parrent_website=self.website,
-            main_title="Test",
-            main_description="Test Description",
-            last_discovery="2022-11-22",
-            last_scrape="2022-11-22",
-        )
-        self.assertEqual(page.main_title, str(page))
+        about_page = example_about_page
+        assert str(about_page) == about_page.main_title
