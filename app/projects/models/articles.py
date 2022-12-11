@@ -16,8 +16,6 @@ class BlogArticlePage(WebPage):
         null=True,
     )
     date_published = models.DateTimeField(blank=True, null=True)
-    last_discovery = models.DateTimeField(blank=True, null=True)
-    last_scrape = models.DateTimeField(blank=True, null=True)
     parrent_blog_page = models.ForeignKey(BlogPage, on_delete=models.CASCADE)
 
     def __str__(self):
