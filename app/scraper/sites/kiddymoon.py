@@ -64,8 +64,8 @@ class KiddyMoon(ScrapingScraper):
 
     def parse_category_level_1_elements(
         self,
-        HtmlElement=None,
-        SeleniumWebElement=None,
+        HtmlElement,
+        SeleniumWebElement,
     ):
         # category_url = HtmlElement.xpath("./@href")[0]
         # category_name = HtmlElement.xpath("./h5/text()")[0]

@@ -32,7 +32,9 @@ urls_casto = [
 
 
 urls_misioo = [
+    # "https://misioohandmade.pl/",
     "https://misioohandmade.pl/sklep/",
+    # "https://misioohandmade.pl/suche-baseny-z-pileczkami/",
 ]
 
 
@@ -74,6 +76,26 @@ def find_category_data():
             pass
 
 
+##############
+@calculate_time
+def find_product_data_misioo():
+    for url in urls_misioo:
+        validatation = ValidationCrawler().validate_page_status(url=url)
+        if validatation:
+            with MisioHandMade() as scraper:
+                meta_data = scraper.visit_web_page(url=url)
+                print(meta_data)
+                products = scraper.find_product_pages_for_all_pages_selenium(
+                    parser_used=scraper.parse_product_level_1_elements,
+                    extract_with_selenium=False,
+                )
+                for prod in products:
+                    print(prod)
+                scraper.do_cleanup()
+        else:
+            pass
+
+
 def find_category_data_misio():
     for url in urls_misioo:
         validatation = ValidationCrawler().validate_page_status(url=url)
@@ -81,8 +103,11 @@ def find_category_data_misio():
             with MisioHandMade() as scraper:
                 meta_data = scraper.visit_web_page(url=url)
                 print(meta_data)
-                element = scraper.parse_driver_response
-                categories = scraper.find_all_category_pages(html_element=element)
+                element = scraper.parse_driver_response()
+                categories = scraper.find_all_category_pages(
+                    html_element=element,
+                    parser_used=scraper.parse_category_level_1_elements,
+                )
                 for cat in categories:
                     print(cat)
                 scraper.do_cleanup()
@@ -90,49 +115,5 @@ def find_category_data_misio():
             pass
 
 
-def validate_page_status():
-    with KiddyMoon() as scraper:
-        for url in urls_kiddy:
-            response = scraper.python_get(url=url)
-            print(response)
-            print(type(response))
-
-
-def dumb_test():
-    with KiddyMoon() as scraper:
-        scraper.visit_web_page(url=urls_kiddy[0])
-        element = scraper.parse_driver_response()
-
-        categories = scraper.find_all_category_pages(
-            html_element=element,
-            category_level=1,
-            parser_used=scraper.categories_parsers_dict_by_level[1],
-            extract_with_selenium=True,
-        )
-        # categories = scraper.extract_urls_with_names(
-        #     html_element=element,
-        #     xpath_to_search=scraper.categories_discovery_xpath_dict[1][
-        #         "category_element_xpath"
-        #     ],
-        #     name_attr_xpath=scraper.categories_discovery_xpath_dict[1][
-        #         "category_name_xpath"
-        #     ],
-        #     parser_used=scraper.parse_category_level_1_elements,
-        #     extract_with_selenium=False,
-        # )
-        # categories = scraper.find_selenium_elements(
-        #     xpath_to_search=scraper.categories_discovery_xpath_dict[1][
-        #         "category_url_xpath"
-        #     ],
-        # )
-        for cat in categories:
-            print(cat)
-
-
-def test_random_agent():
-    agent = get_random_user_agent(USER_AGENTS)
-    print(agent)
-
-
 if __name__ == "__main__":
-    find_product_data()
+    find_product_data_misioo()

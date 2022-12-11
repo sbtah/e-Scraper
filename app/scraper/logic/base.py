@@ -12,6 +12,7 @@ from selenium import webdriver
 from selenium.common.exceptions import (
     ElementNotVisibleException,
     NoSuchElementException,
+    ElementClickInterceptedException,
 )
 from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.chrome.service import Service

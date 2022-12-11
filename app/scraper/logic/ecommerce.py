@@ -47,7 +47,7 @@ class EcommerceScraper(BaseScraper):
         Dictionary of needed Xpaths and settings for discoverying CategoryPages.
         CategoryPages can have other Categories as a childs.
         Main (root) Categories are mapped to 1 while childs are 2, 3, 4 and so on.
-        :param category_element_xpath: Must return enitre list of HtmlElements to parse.
+        :param category_element_xpath: Must return list of Elements to parse.
         """
         return {
             1: {
@@ -62,7 +62,7 @@ class EcommerceScraper(BaseScraper):
         """
         Dictionary of needed Xpaths and settings for discoverying ProductPages.
         ProductsPages are mapped to CategoryPage level by key.
-        :param product_url_xpath: Must return enitre <a> tag.
+        :param product_url_xpath: Must return list of Elements to parse.
         """
         return {
             1: {
@@ -74,6 +74,9 @@ class EcommerceScraper(BaseScraper):
             },
         }
 
+    # TODO:
+    # Dunno if this is needed at all...
+    # ...
     @property
     def categories_parsers_dict_by_level(self):
         return {
@@ -201,9 +204,13 @@ class EcommerceScraper(BaseScraper):
         Used in discovery of WebPages Elements on current page.
         Finds all Urls and 'Names' in given HtmlElements.
         Returns generator of tuples, containing (url, name).
-        :param xpath_to_search: Xpath that should return list of HtmlElements.
-        :param name_xpath: Can be set to ./text() or @title,
-            - or some other argument in HTML tag where data is located.
+        :param xpath_to_search: - Xpath that should return list of HtmlElements
+            or SeleniumWebElements.
+        :param parser_used: - class method that will extract needed data,
+            (URL, Name) from each element in list.
+        :param extract_with_selenium: - Default to False means,
+            that parsing will expect to work on HtmlElements, while True means,
+            that parser have to deal with Selenium Web Element.
         """
         if extract_with_selenium == False:
             categories_list = self.find_all_elements(
@@ -247,7 +254,7 @@ class EcommerceScraper(BaseScraper):
             with CategoryPage related xpathses.
         self.categories_discovery_xpath_dict keys are implying CategoryPage level,
             where Root/Main CategoryPage is 1 while childs are 2, 3, 4 and so on.
-
+        :param parser_used:
         :param extract_with_selenium:
             - If set to true data will be extracted with Selenium,
                 instead of lxml.
@@ -354,7 +361,7 @@ class EcommerceScraper(BaseScraper):
                     yield prod
             else:
                 self.logger.error(
-                    f"(find_all_product_pages) Returned: {products} - Quiting."
+                    f"(find_all_product_pages) Returned: '{products}' Products at URL: {self.url} - Quiting."
                 )
                 pass
 
@@ -402,7 +409,7 @@ class EcommerceScraper(BaseScraper):
                         yield prod
                 else:
                     self.logger.error(
-                        f"(find_all_product_pages) Returned: {products} - Quiting."
+                        f"(find_all_product_pages) Returned: '{products}' Products at URL: {self.url} - Quiting."
                     )
                     pass
 
