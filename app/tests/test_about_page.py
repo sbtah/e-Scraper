@@ -48,6 +48,7 @@ class TestAboutPageModel:
                 main_title="Test About",
                 main_description="Sample about us text...",
             )
+        assert AboutPage.objects.all().count() == 1
 
     def test_str_method_returns_proper_data(sel, example_about_page):
         """Test that __str__ for object is properly returning data."""
