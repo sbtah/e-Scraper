@@ -7,7 +7,7 @@ class Website(models.Model):
     domain = models.CharField(max_length=200, unique=True)
     is_monitored = models.BooleanField(default=False)
     # Name of file for related Scraper.
-    module_name = models.CharField(max_length=100)
+    module_name = models.CharField(max_length=100, unique=True)
     # Name of class for related Scraper.
     scraper_class = models.CharField(max_length=100, unique=True)
 
