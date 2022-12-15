@@ -1,6 +1,7 @@
 import pytest
 from projects.models.websites import Website
 from projects.models.blogs import BlogPage
+from projects.models.articles import BlogArticlePage
 from projects.models.about import AboutPage
 
 
@@ -85,3 +86,40 @@ def example_about_page(example_website):
         main_description="Sample about us text...",
     )
     return example_about_page
+
+
+@pytest.fixture
+def blog_article_page_create_test_data():
+    return {
+        "discovery_url": "http://test.com/blog/test",
+        "current_url": "http://test.com/blog/test",
+        "is_active": True,
+        "seo_title": "Hello, test article!",
+        "meta_description": "Test Article Meta ...",
+        "canonical_url": "http://test.com/blog/test",
+        "blog_title": "Hello, test article!",
+        "blog_author": "Test Author",
+        "blog_tags": ["Test1", "Test2"],
+    }
+
+
+@pytest.fixture
+def example_blog_article_page(example_website, example_blog_page):
+
+    website = example_website
+    blog_page = example_blog_page
+
+    example_blog_article_page = BlogArticlePage.objects.create(
+        discovery_url="http://test.com/blog/test",
+        current_url="http://test.com/blog/test",
+        is_active=True,
+        seo_title="Hello, test article!",
+        meta_description="Test Article Meta ...",
+        canonical_url="http://test.com/blog/test",
+        parrent_website=website,
+        blog_title="Hello, test article!",
+        blog_author="Test Author",
+        blog_tags=["Test1", "Test2"],
+        parrent_blog_page=blog_page,
+    )
+    return example_blog_article_page
