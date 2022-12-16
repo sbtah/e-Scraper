@@ -5,7 +5,7 @@ from projects.models.webpages import WebPage
 class ContactPage(WebPage):
     """Class for ContactPage object."""
 
-    company_name = models.CharField(max_length=255, unique=True)
+    company_name = models.CharField(max_length=255)
     company_address = models.TextField(blank=True)
     company_phone = models.CharField(max_length=255, blank=True)
     company_email_address = models.EmailField(blank=True)
