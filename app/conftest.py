@@ -1,5 +1,6 @@
 import pytest
 from projects.models.websites import Website
+from projects.models.contact import ContactPage
 from projects.models.blogs import BlogPage
 from projects.models.home import HomePage
 from projects.models.articles import BlogArticlePage
@@ -155,3 +156,38 @@ def example_blog_article_page(example_website, example_blog_page):
         parrent_blog_page=blog_page,
     )
     return example_blog_article_page
+
+
+@pytest.fixture
+def contact_page_create_test_data():
+    return {
+        "discovery_url": "http://test.com/contact",
+        "current_url": "http://test.com/contact",
+        "is_active": True,
+        "seo_title": "Contact Page",
+        "meta_description": "Test Contact Meta ...",
+        "canonical_url": "http://test.com/contact",
+        "company_name": "Test Company",
+        "company_address": "Test Address",
+        "company_phone": "111-111-111",
+        "company_email_address": "test@company.com",
+    }
+
+
+@pytest.fixture
+def example_contact_page(example_website):
+    website = example_website
+    example_contact_page = ContactPage.objects.create(
+        discovery_url="http://test.com/contact",
+        current_url="http://test.com/contact",
+        is_active=True,
+        seo_title="Contact Page",
+        meta_description="Test Contact Meta ...",
+        canonical_url="http://test.com/contact",
+        parrent_website=website,
+        company_name="Test Company",
+        company_address="Test Address",
+        company_phone="111-111-111",
+        company_email_address="test@company.com",
+    )
+    return example_contact_page
