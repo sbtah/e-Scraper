@@ -9,4 +9,4 @@ class HomePage(WebPage):
     main_description = models.TextField()
 
     def __str__(self):
-        return self.title
+        return self.main_title

@@ -84,6 +84,7 @@ class TestBlogArticlePageModel:
         assert isinstance(blog_article_page.blog_tags, list)
         assert type(blog_article_page.blog_tags) == type(creation_data["blog_tags"])
 
+    @pytest.mark.django_db(transaction=True)
     def test_blog_title_must_be_unique(
         self,
         example_website,

@@ -96,6 +96,7 @@ def find_product_data_misioo():
             pass
 
 
+@calculate_time
 def find_category_data_misio():
     for url in urls_misioo:
         validatation = ValidationCrawler().validate_page_status(url=url)
@@ -116,4 +117,4 @@ def find_category_data_misio():
 
 
 if __name__ == "__main__":
-    find_product_data_misioo()
+    find_category_data_misio()

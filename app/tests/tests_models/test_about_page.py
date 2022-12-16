@@ -78,7 +78,7 @@ class TestAboutPageModel:
         about_page_1 = example_about_page
 
         with pytest.raises(Exception):
-            about_page_2 = AboutPage.objects.create(
+            AboutPage.objects.create(
                 discovery_url="http://test.com/about",
                 current_url="http://test.com/about",
                 is_active=True,

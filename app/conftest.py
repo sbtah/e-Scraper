@@ -1,6 +1,7 @@
 import pytest
 from projects.models.websites import Website
 from projects.models.blogs import BlogPage
+from projects.models.home import HomePage
 from projects.models.articles import BlogArticlePage
 from projects.models.about import AboutPage
 
@@ -86,6 +87,37 @@ def example_about_page(example_website):
         main_description="Sample about us text...",
     )
     return example_about_page
+
+
+@pytest.fixture
+def home_page_create_test_data():
+    return {
+        "discovery_url": "http://test.com/home",
+        "current_url": "http://test.com/home",
+        "is_active": True,
+        "seo_title": "Test Home",
+        "meta_description": "Test Meta Home",
+        "canonical_url": "http://test.com/home",
+        "main_title": "Test Home",
+        "main_description": "Sample home page...",
+    }
+
+
+@pytest.fixture
+def example_home_page(example_website):
+    website = example_website
+    example_home_page = HomePage.objects.create(
+        discovery_url="http://test.com/home",
+        current_url="http://test.com/home",
+        is_active=True,
+        seo_title="Test Home",
+        meta_description="Test Meta Home",
+        canonical_url="http://test.com/home",
+        parrent_website=website,
+        main_title="Test Home",
+        main_description="Sample home page...",
+    )
+    return example_home_page
 
 
 @pytest.fixture

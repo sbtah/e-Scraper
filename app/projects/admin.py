@@ -1,4 +1,5 @@
 from django.contrib import admin
+from projects.models.articles import BlogArticlePage
 from projects.models.about import AboutPage
 from projects.models.blogs import BlogPage
 from projects.models.categories import CategoryPage
