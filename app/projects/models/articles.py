@@ -8,7 +8,6 @@ class BlogArticlePage(WebPage):
     """Class for BlogArticlePage object."""
 
     blog_title = models.CharField(max_length=255, unique=True)
-    main_description = models.TextField(blank=True)
     blog_author = models.CharField(max_length=255, blank=True)
     blog_tags = ArrayField(
         models.CharField(max_length=100, blank=True),
