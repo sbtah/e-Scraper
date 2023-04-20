@@ -1,4 +1,7 @@
 from scraper.logic.ecommerce import EcommerceScraper
+from lxml.html import tostring, HtmlElement
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import Select
 
 
 class ScrapingScraper(EcommerceScraper):
@@ -19,12 +22,15 @@ class ScrapingScraper(EcommerceScraper):
         }
 
     @property
-    def home_page_xpath_dict(self):
-        """Dictionary of needed Xpathses for HomePage."""
-        return {
-            "main_title": "",
-            "main_description": "",
-        }
+    def product_page_variants_xpath_dict(self):
+        """
+        Dictionary of needed Xpathses that triggers ProductData selection of variants on ProductPage.
+        Keys are reflecting idea of multiple pickers of variants on ProductPage.
+        So for every element in list of buttons / dropdowns produced by key "1",
+            - in this dict, picker will click every element in list produced by key "2" and "3".
+        We assume 3 is max for now.
+        """
+        raise NotImplementedError
 
     def visit_web_page(self, url):
         """
@@ -35,7 +41,7 @@ class ScrapingScraper(EcommerceScraper):
         response = self.selenium_get(url=url)
         element = self.parse_response(response=response)
         meta_data = self.extract_meta_data(html_element=element)
-        self.close_cookies_banner(element=element)
+        self.close_cookies_banner(html_element=element)
         return meta_data
 
     def extract_meta_data(self, html_element):
@@ -84,23 +90,55 @@ class ScrapingScraper(EcommerceScraper):
         self.logger.info("Meta Data extracted!")
         return meta_dict
 
+    def activate_product_variants(self, html_element):
+        """
+        ! This have to be implemented at individual store scraper.
+        Given the HtmlElement of ProductPage search for Xpathses,
+            used for activation of ProductData variants.
+        For every possible combination of variants return HtmlElement.
+        """
+        raise NotImplementedError
+
+    def extract_product_data(self, html_element):
+        product_data = {}
+        """
+        ! This have to be implemented at individual store scraper.
+        Needs to return a dict of values that we want to track,
+            - and extract from ProductPage,
+        ProductData object will be generated from this data,
+            - with fields/values corpesponding key: values in dict.
+        """
+        raise NotImplementedError
+
+    def scrape_product_page(self, url):
+        """
+        Visit ProductPage by url.
+        Parse each HtmlElement returned by activate_product_variants.
+        Returns dictionary of product_page_data which contains meta_data of ProductPage,
+            and products_data list of ProductData dictionaries.
+        """
+
+        product_page_data = {}
+        product_page_data["products_data"] = {}
+
+        meta_data = self.visit_web_page(url=url)
+        product_page_data["meta_data"] = meta_data
+
+        element = self.parse_driver_response()
+        product_data_elements = self.activate_product_variants(html_element=element)
+
+        for idx, product_element in enumerate(product_data_elements):
+            product_page_data["products_data"][idx] = self.extract_product_data(
+                html_element=product_element
+            )
+
+        return product_page_data
+
     def extract_home_page_data(self, html_element):
         """"""
         pass
 
-    def extract_category_page_data(self, html_element, category_level):
-        """"""
-        pass
-
-    def extract_product_page_data(self, html_element):
-        """"""
-        pass
-
-    def extract_product_data(self, html_element):
-        """"""
-        pass
-
-    def extract_about_page_data(self, html_element):
+    def extract_category_page_data(self, html_element):
         """"""
         pass
 
@@ -112,17 +150,5 @@ class ScrapingScraper(EcommerceScraper):
         """"""
         pass
 
-    def scrape_home_page(self, root_categories_on_home=True):
-        """
-        Request Website by self.main_url.
-        Returns dictionary of data for HomePage object.
-        """
-        home_page_dict = {}
-
-        meta_data = self.visit_web_page(url=self.main_url)
-        element = self.parse_driver_response()
-        home_page_dict["meda_data"] = meta_data
-        # TODO :
-        # ADD Extracting of HomePage data
-
-        return home_page_dict
+    def scrape_category_page(self):
+        pass

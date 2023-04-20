@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from selenium.webdriver.support.ui import Select
 from lxml.html import HTMLParser, document_fromstring, fromstring
 from scraper.helpers.logger import logger
 from scraper.helpers.randoms import (
@@ -7,6 +7,7 @@ from scraper.helpers.randoms import (
     random_sleep_small,
     random_sleep_small_l2,
 )
+from selenium.webdriver.remote.webelement import WebElement
 from scraper.options.settings import USER_AGENTS
 from selenium import webdriver
 from selenium.common.exceptions import (
@@ -48,9 +49,14 @@ class BaseScraper:
         return agent
 
     @property
+    def potenial_popups_xpaths(self):
+        """Should return a list of Xpaths to can appear on the Website randomly."""
+        raise NotImplementedError
+
+    @property
     def cookies_close_xpath(self):
-        """Xpath to element that closes cookies banner on click."""
-        return ""
+        """Xpath to element that closes cookies policy banner on click."""
+        raise NotImplementedError
 
     @property
     def driver(self):
@@ -211,6 +217,30 @@ class BaseScraper:
             self.logger.error(f"(find_selenium_element) exception: {e}")
             return None
 
+    def find_selenium_select_element(
+        self,
+        xpath_to_search,
+        ignore_not_found_errors=False,
+    ):
+        """
+        Used with Selenium driver.
+        Find 'select' (drop-down) element by Xpath.
+        Return element to interact with.
+        - :param ignore_not_found_errors:
+            Can be set to True to not produce error logs,
+            when element is not found.
+        """
+        try:
+            select_element = Select(
+                self.find_selenium_element(
+                    xpath_to_search=xpath_to_search,
+                    ignore_not_found_errors=ignore_not_found_errors,
+                )
+            )
+            return select_element
+        except Exception as e:
+            self.logger.error(f"(find_selenium_select_element) exception: {e}")
+
     def find_selenium_elements(
         self,
         xpath_to_search,
@@ -220,9 +250,9 @@ class BaseScraper:
         Used with Selenium driver.
         Finds elements by specified Xpath.
         Return Selenium web elements to interact with.
-        :param ignore_not_found_errors:
-            - Can be set to True to not produce error logs,
-                when elements are not found.
+         - :param ignore_not_found_errors:
+            Can be set to True to not produce error logs,
+            when elements are not found.
         """
         try:
             elements = self.driver.find_elements(
@@ -243,7 +273,7 @@ class BaseScraper:
                 self.logger.error(f"Selenium element not found.")
                 return None
         except Exception as e:
-            self.logger.error(f"(find_selenium_element) exception: {e}")
+            self.logger.error(f"(find_selenium_element) Exception: {e}")
             return None
 
     def find_all_elements(
@@ -255,7 +285,6 @@ class BaseScraper:
         """
         Finds elements by Xpath on given HTMLElement.
         Returns lists of HtmlElements for further processing.
-        Xpath have to lead to entire HTML tag not attributes.
         :param ignore_not_found_errors:
             - Can be set to True to not produce error logs,
                 when elements are not found.
@@ -276,7 +305,32 @@ class BaseScraper:
                     )
                     return None
         except Exception as e:
-            self.logger.error(f"(find_all_elements) Some other exception: {e}")
+            self.logger.error(f"(find_all_elements) Some other Exception: {e}")
+            return None
+
+    def find_element(
+        self,
+        html_element,
+        xpath_to_search,
+        ignore_not_found_errors=False,
+    ):
+        """
+        Find single element/value by Xpath on provided HtmlElement.
+        Returns searched value.
+        """
+        try:
+            element = html_element.xpath(xpath_to_search)[0]
+            return element
+        except IndexError:
+            if ignore_not_found_errors:
+                return None
+            else:
+                self.logger.error(
+                    "(find_element) Returned an empty list.",
+                )
+                return None
+        except Exception as e:
+            self.logger.error(f"(find_element) Some other Exception: {e}")
             return None
 
     def initialize_html_element(self, selenium_element):
@@ -287,16 +341,50 @@ class BaseScraper:
             - Xpath to element that we have to click to
                 load desired element (ie: modal?).
         """
-        try:
-            # Yes I know that Selenium click() relies on move_to_element()
-            self.scroll_to_element(selenium_element=selenium_element)
-            selenium_element.click()
-            self.logger.debug("Successfully clicked on specified element.")
-            random_sleep_small_l2()
-            return True
-        except NoSuchElementException:
+        if isinstance(selenium_element, WebElement):
+            try:
+                # Yes I know that Selenium click() relies on move_to_element()
+                self.scroll_to_element(selenium_element=selenium_element)
+                selenium_element.click()
+                self.logger.debug("Successfully clicked on specified element.")
+                random_sleep_small_l2()
+                return True
+            except NoSuchElementException:
+                self.logger.error(
+                    "Failed at finding element to click. Maybe element was already clicked?"  # noqa
+                )
+                return None
+            except ElementClickInterceptedException:
+                self.logger.error(
+                    f"Failed at clicking element - interception detected. Trying known popups Xpathses..."
+                )
+                try:
+                    self.close_popups_elements_on_error(
+                        xpathses_to_search=self.potenial_popups_xpaths
+                    )
+                    self.scroll_to_element(selenium_element=selenium_element)
+                    selenium_element.click()
+                    self.logger.debug("Successfully clicked on specified element.")
+                    random_sleep_small_l2()
+                    return True
+                except Exception as ee:
+                    self.logger.error(
+                        f"(initialize_html_element: ElementClickInterceptedException check) Some other exception: {ee}",  # noqa
+                    )
+                    return None
+            except ElementNotVisibleException:
+                self.logger.error(
+                    "ELEMENT NOT VISIBLE OCCURRED IMPLEMENT PROPER MECHANIC!"  # noqa
+                )
+                return None
+            except Exception as e:
+                self.logger.error(
+                    f"(initialize_html_element) Some other Exception: {e}",
+                )
+                return None
+        else:
             self.logger.error(
-                "Failed at finding element to click. Maybe element was already clicked?"  # noqa
+                "Element is not instance of Selenium's Webelement."  # noqa
             )
             return None
 
@@ -321,21 +409,30 @@ class BaseScraper:
         """
         Takes Selenium Element as an input, sends specified text to it.
         """
-
-        try:
-            self.scroll_to_element(selenium_element=selenium_element)
-            selenium_element.clear()
-            selenium_element.send_keys(text)
-            selenium_element.send_keys(Keys.ENTER)
-            random_sleep_small()
-            self.logger.info(
-                f"Successfully send text: '{text}' to desired element.",
-            )
-        except ElementNotVisibleException:
-            self.logger.error("Specified element is not visible.")
-        except Exception as e:
+        if isinstance(selenium_element, WebElement):
+            try:
+                self.scroll_to_element(selenium_element=selenium_element)
+                selenium_element.clear()
+                selenium_element.send_keys(text)
+                selenium_element.send_keys(Keys.ENTER)
+                random_sleep_small()
+                self.logger.info(
+                    f"Successfully send text: '{text}' to desired element.",
+                )
+            except (ElementNotVisibleException, ElementClickInterceptedException):
+                # TODO:
+                # Add unified logic of reacting to this kind of Exceptions.
+                # Like : ElementClickInterceptedException and ElementNotVisibleException.
+                # Example: Run check for defined Xpathses,
+                #  - of elements that may appear on the website and close them.
+                self.logger.error("Specified element is not visible or intercepted.")
+            except Exception as e:
+                self.logger.error(
+                    f"(send_text_to_element) Some other exception: {e}",
+                )
+        else:
             self.logger.error(
-                f"(send_text_to_element) Some other exception: {e}",
+                "Element is not instance of Selenium's Webelement."  # noqa
             )
 
     def scroll_to_element(self, selenium_element):
@@ -353,32 +450,56 @@ class BaseScraper:
                 f"(scroll_to_element) Some other exception: {e}",
             )
 
-    def close_selenium_element(self, element, xpath_to_search):
-        """"""
+    def find_and_click_selenium_element(self, html_element, xpath_to_search):
+        """
+        Given the HtmlElement searches for defined Xpath and tries to click it.
+        """
+        # This check is faster then Selenium's.
         if_banner_in_html = self.if_xpath_in_element(
-            html_element=element, xpath_to_search=xpath_to_search
+            html_element=html_element, xpath_to_search=xpath_to_search
         )
         if if_banner_in_html:
-            self.logger.info("WebElement found, closing...")
+            self.logger.info("WebElement found, clicking...")
             try:
-                element_close_button = self.find_selenium_element(
+                element_click_button = self.find_selenium_element(
                     xpath_to_search=xpath_to_search
                 )
-                self.initialize_html_element(
-                    selenium_element=element_close_button,
+                initialized = self.initialize_html_element(
+                    selenium_element=element_click_button,
                 )
-                self.logger.info("Successfully closed WebElement.")
+                if initialized:
+                    self.logger.info("Successfully clicked WebElement.")
+                else:
+                    self.logger.error("Failed at clicking WebElement.")
             except Exception as e:
-                self.logger.error(f"(close_selenium_element) Some other exception: {e}")
+                self.logger.error(
+                    f"(find_and_click_selenium_element) Some other exception: {e}"
+                )
         else:
             self.logger.info("No WebElement to click, passing...")
 
-    def close_cookies_banner(self, element):
+    def close_cookies_banner(self, html_element):
         """
         Finds Cookies Policy in provided HtmlElement and closes it.
         Needs self.cookies_close_xpath to work.
         """
-        self.close_selenium_element(
-            element=element,
+        self.find_and_click_selenium_element(
+            html_element=html_element,
             xpath_to_search=self.cookies_close_xpath,
         )
+
+    def close_popups_elements_on_error(self, xpathses_to_search):
+        """
+        Searches list of knows Xpathses for popup elements.
+        If element is found, closes it.
+        """
+        for xpath in xpathses_to_search:
+            element = self.find_selenium_element(
+                xpath_to_search=xpath, ignore_not_found_errors=True
+            )
+            if element is not None:
+                self.logger.info("Found critical popup element. Closing.")
+                element.click()
+                random_sleep_small()
+            else:
+                pass

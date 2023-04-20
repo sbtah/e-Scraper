@@ -2,9 +2,10 @@ from scraper.helpers.logger import logger
 import importlib
 
 
-class ScrapingScraper:
+class BaseTasker:
     """
-    This scraper loads specified EcommerceScraper for tracked Website.
+    This Tasker loads specified Scrpaer for tracked Website,
+        and start needed scraping jobs.
     """
 
     def __init__(self, module_name, class_name, logger=logger, *args, **kwargs):
@@ -19,7 +20,7 @@ class ScrapingScraper:
         try:
             module = importlib.import_module(f"scraper.sites.{self.module_name}")
             scraper = getattr(module, f"{self.class_name}")
-            self.logger.debug(f"Scraper started: {self.module_name}.{self.class_name}")
+            self.logger.debug(f"Found Scraper: {self.module_name}.{self.class_name}")
             return scraper
         except ModuleNotFoundError:
             self.logger.error(f"Module was not found: {self.module_name}")

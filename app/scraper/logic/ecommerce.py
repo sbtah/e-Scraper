@@ -18,28 +18,18 @@ class EcommerceScraper(BaseScraper):
 
     @property
     def main_url(self):
-        """Main url of tracked site leading to HomePage."""
-        raise NotImplemented
+        """Main Url for the tracked Website."""
+        raise NotImplementedError
 
     @property
     def main_categories_url(self):
         """Url from which discovery of CategoryPages is starting."""
-        raise NotImplemented
-
-    @property
-    def terms_and_conditions_url(self):
-        """Url from which discovery of TermsPage is starting."""
-        raise NotImplemented
-
-    @property
-    def about_page_url(self):
-        """Url from which discovery of AboutPage is starting."""
-        raise NotImplemented
+        raise NotImplementedError
 
     @property
     def blog_page_url(self):
         """Url from which discovery of BlogPage is starting."""
-        raise NotImplemented
+        raise NotImplementedError
 
     @property
     def categories_discovery_xpath_dict(self):
@@ -47,23 +37,25 @@ class EcommerceScraper(BaseScraper):
         Dictionary of needed Xpaths and settings for discoverying CategoryPages.
         CategoryPages can have other Categories as a childs.
         Main (root) Categories are mapped to 1 while childs are 2, 3, 4 and so on.
-        :param category_element_xpath: Must return list of Elements to parse.
-        """
+
+        - :param category_element_xpath: Must return list of Elements to parse.
+
         return {
             1: {
-                "category_element_xpath": "",
-                "with_child_categories": False,
-                "with_products": False,
+                "category_element_xpath": None,
             },
         }
+        """
+        raise NotImplementedError
 
     @property
     def products_discovery_xpath_dict(self):
         """
         Dictionary of needed Xpaths and settings for discoverying ProductPages.
         ProductsPages are mapped to CategoryPage level by key.
-        :param product_url_xpath: Must return list of Elements to parse.
-        """
+
+        - :param product_url_xpath: Must return list of Elements to parse.
+
         return {
             1: {
                 "product_url_xpath": "",
@@ -73,28 +65,8 @@ class EcommerceScraper(BaseScraper):
                 "product_previous_page_xpath": "",
             },
         }
-
-    # TODO:
-    # Dunno if this is needed at all...
-    # ...
-    @property
-    def categories_parsers_dict_by_level(self):
-        return {
-            1: self.parse_category_level_1_elements,
-            2: self.parse_category_level_2_elements,
-            3: self.parse_category_level_3_elements,
-            4: self.parse_category_level_4_elements,
-            5: self.parse_category_level_5_elements,
-            6: self.parse_category_level_6_elements,
-        }
-
-    @property
-    def products_parsers_dict_by_level(self):
-        return {
-            1: self.parse_product_level_1_elements,
-            2: self.parse_product_level_2_elements,
-            3: self.parse_product_level_3_elements,
-        }
+        """
+        raise NotImplementedError
 
     def parse_category_level_1_elements(
         self, HtmlElement=None, SeleniumWebElement=None
@@ -188,11 +160,6 @@ class EcommerceScraper(BaseScraper):
         """
         raise NotImplementedError
 
-    # TODO:
-    # ADD Parser integration.
-    # Whole concept of returning generator of tuples stays.
-    # But I need to parse HTMLElement coming from find_all_elements before I return generator.
-    #
     def extract_urls_with_names(
         self,
         html_element,

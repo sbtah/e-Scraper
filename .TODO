@@ -34,7 +34,7 @@ Scraper:
         - Add helper function that will randomly pick User Agent from a list,
         - Add settings.py that will hold important settings for Scrapers/Crawlers.
 
-
+    !....
     * Add find_product_pages_for_all_pages
     Add method that will allow traversing a pagination of products based on URLS not Selenium:
         - find example page that doesn't requires Selenium to go through pages,
@@ -53,10 +53,13 @@ Scraper:
         - interact with dropdowns,
         - click on radials,
         - click on checkboxes,
+        !Finished
+        - generate select element 
 
+    !Finished
     * Add method(s) for reacting to few Selenium Exceptions
     there are popups to close everywhere!:
-        - create a dict of xpathses to close for some nasty web elements,
+        - create a list of xpathses to close for some nasty web elements,
             that can appear randomly.
         - create a universal method,
             that will be initiated on ElementClickInterceptedException,

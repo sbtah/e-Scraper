@@ -15,33 +15,16 @@ class CategoryPage(WebPage):
     """Class for Category Page object."""
 
     category_name = models.CharField(max_length=255)
-
-    # I use single object for all Categories.
-    # To differ root Category from childs I will use nesting levels.
-    # Where root Category is 1.
-    class NestLevel(models.IntegerChoices):
-        first = 1
-        second = 2
-        third = 3
-        fourth = 4
-        fifth = 5
-        sixth = 6
-
-    category_nesting_level = models.IntegerField(
-        choices=NestLevel.choices,
-        validators=[MinValueValidator(1), MaxValueValidator(6)],
-        blank=True,
-        null=True,
-    )
     category_description = models.TextField(blank=True)
-    # Some Categories can be childs of other Categories.
-    parrent_category = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, blank=True, null=True
-    )
+
+    have_products = models.BooleanField(default=False)
+    have_categories = models.BooleanField(default=True)
+
+    categories = models.ManyToManyField("self", blank=True)
+    products = models.ManyToManyField(ProductPage, blank=True)
+
     related_categories_last_discovery = models.DateTimeField(blank=True, null=True)
     related_products_last_discovery = models.DateTimeField(blank=True, null=True)
-    # Same ProductPage can be in many different CategoryPages.
-    products = models.ManyToManyField(ProductPage, blank=True)
 
     def __str__(self):
         return self.category_name
